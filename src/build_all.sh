@@ -1,0 +1,9 @@
+cd frontends/
+sh libreddit/build.sh
+sh nitter/build.sh
+sh rimgo/build.sh
+sh simplytranslate/build.sh
+sh breezewiki/build.sh
+sh anonymousoverflow/build.sh
+sh dumb/build.sh
+sh ruraldictionary/build.sh

@@ -1,0 +1,1 @@
+redisassert.o: redisassert.c

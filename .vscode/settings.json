@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "*.ejs": "html",
+        "*.sass": "sass",
+        "*.html": "html",
+        "string.h": "c",
+        "io.h": "c"
+    }
+}

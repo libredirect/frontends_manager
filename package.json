@@ -1,0 +1,64 @@
+{
+  "name": "libredirect_frontends_manager",
+  "productName": "libredirect_frontends_manager",
+  "version": "1.0.0",
+  "description": "My Electron application description",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "echo \"No linting configured\""
+  },
+  "keywords": [],
+  "author": {
+    "name": "ManeraKai",
+    "email": "manerakai@protonmail.com"
+  },
+  "license": "GPLv3",
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
+    "node": "^19.8.1",
+    "docker-compose": "^0.23.19",
+    "node-netstat": "^1.8.0",
+    "pidusage": "^3.0.2"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.1.1",
+    "@electron-forge/maker-deb": "^6.1.1",
+    "@electron-forge/maker-squirrel": "^6.1.1",
+    "@electron-forge/maker-zip": "^6.1.1",
+    "@electron-forge/maker-rpm": "*",
+    "@electron-forge/maker-flatpak": "*",
+    "electron": "24.1.3"
+  },
+  "config": {
+    "forge": {
+      "makers": [
+        {
+          "name": "@electron-forge/maker-zip",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {
+            "options": {
+              "name": "libredirect_frontends_manager",
+              "priority": "important",
+              "productName": "LibRedirect Frontends Manager",
+              "genericName": "LibRedirect",
+              "maintainer": "ManeraKai",
+              "homepage": "https://libredirect.github.io/",
+              "icon": "src/assets/imgs/icon.png",
+              "categories": [
+                "Utility"
+              ],
+              "description": "Host frontends locally on your computer."
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,53 @@
+:root {
+    --main-bg: #1b1f26;
+    --text-color: #fff;
+    --muted-text-color: #b3b3b3;
+    --code-bg: #36383d;
+    --input-bg: #2b303b;
+    --input-bg-hover: #3b404b;
+    --meta-bg: rgb(82, 82, 98);
+    --divider-color: #42464e;
+    --link-color: #92adff;
+}
+
+[data-theme="light"] {
+    --main-bg: rgb(219, 219, 219);
+    --text-color: #000;
+    --muted-text-color: #636363;
+    --code-bg: #36383d;
+    --input-bg: rgb(188, 188, 188);
+    --input-bg-hover: rgb(168, 168, 168);
+    --meta-bg: rgb(170, 168, 168);
+    --divider-color: #b5b5b5;
+    --link-color: #335ad0;
+}
+
+a {
+    color: var(--link-color);
+}
+
+
+html {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+.icon {
+    width: 2rem;
+    min-width: 2rem;
+    height: 2rem;
+    min-height: 2rem;
+    cursor: pointer;
+}
+
+.icon img {
+    background: white;
+    border-radius: 50%;
+    padding: .25rem;
+}
+
+details {
+    cursor: pointer;
+}

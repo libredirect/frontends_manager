@@ -1,0 +1,32 @@
+<details class="comments">
+    <summary>
+        Show
+        <b
+            >{{ (len .Comments) }} comment{{ if gt (len .Comments) 1 }}s{{
+            end }}</b
+        >
+    </summary>
+    <div class="comments-parent">
+        {{ range $comment := .Comments }}
+        <div class="comment-parent">
+            <div class="comment">
+                <div class="comment-top">
+                    <div class="comment-score" title="Comment Upvotes">
+                        {{ $comment.Upvotes }}
+                    </div>
+                    <div class="comment-body">{{ $comment.Text }}</div>
+                </div>
+                <div class="comment-author">
+                    Commented {{ $comment.Timestamp }} by
+                    <a
+                        href="{{ $comment.AuthorURL }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        >{{ $comment.AuthorName }}</a
+                    >.
+                </div>
+            </div>
+        </div>
+        {{end}}
+    </div>
+</details>

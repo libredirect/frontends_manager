@@ -1,0 +1,131 @@
+body {
+	--text: #fff;
+	--bg-main: #121212;
+	--bg-secondary: #202020;
+	--active: #fbc117;
+	--space: 5px;
+	--danger: #f04141;
+	--danger-light: #f9d0d5;
+	--dark-grey: #767676;
+	--light-grey: #c3c3c3;
+}
+
+@font-face {
+	font-family: "Inter";
+	src: url("Inter-VariableFont_slnt,wght.ttf");
+	font-weight: normal;
+	font-style: normal;
+}
+
+body {
+	margin: auto;
+	padding: 0;
+	font-family: "Inter";
+	font-size: 16px;
+	background-color: var(--bg-main);
+	color: var(--text);
+}
+
+#logo {
+	display: flex;
+	justify-content: center;
+	margin-top: 10px;
+}
+
+#logo img {
+	margin-right: 22px;
+	width: 75px;
+	height: auto;
+}
+
+#logo h1 {
+	font-size: 275%
+}
+
+div.body {
+	margin: 50px;
+	display: flex;
+	justify-content: center;
+	margin: auto;
+	flex-wrap: wrap;
+}
+
+.tile {
+	margin: 20px;
+	border: 1px solid var(--bg-secondary);
+	width: 280px;
+	height: 230px;
+	padding: 20px;
+	text-align: center;
+	text-decoration: none;
+	color: white;
+}
+
+.tile a {
+	text-decoration: none;
+}
+
+.tile h1 {
+	color: white;
+	font-size: 28px;
+}
+
+.tile img {
+	width: 100px;
+	height: 100px;
+	object-fit: contain;
+}
+
+.tile a.button {
+	transition-duration: .1s;
+	font-size: 21px;
+	color: white;
+}
+
+.tile a.button:hover {
+	color: var(--active);
+}
+
+.tile button {
+	background-color: var(--bg-secondary);
+	border: none;
+	color: var(--text);
+	border-radius: 5px;
+	padding: 10px;
+	margin: 3px;
+	display: inline-flex;
+	align-items: center;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+.tile button:hover {
+	color: var(--active);
+}
+
+.tile button:active {
+	transform: translateY(1px);
+}
+
+.tile button:hover svg {
+	color: var(--active);
+}
+
+.tile svg {
+	color: var(--text);
+	padding: 0;
+	margin-right: 5px;
+}
+
+.note {
+	margin: 10px 50px;
+}
+
+.note a {
+	text-decoration: none;
+	color: var(--active);
+}
+
+.note a:hover {
+	text-decoration: underline;
+}

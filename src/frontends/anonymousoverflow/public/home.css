@@ -1,0 +1,113 @@
+body {
+    background-color: var(--main-bg);
+    font-family: sans-serif;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 100vh;
+    width: 100vw;
+
+    margin: 0;
+
+    color: var(--text-color);
+}
+
+.container {
+    width: 40rem;
+}
+
+.footer {
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.view-form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.view-input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 2px solid transparent;
+    border-radius: 3px;
+
+    background-color: var(--input-bg);
+
+    color: var(--text-color);
+
+    transition-duration: 200ms;
+}
+
+.view-input:focus {
+    outline: none;
+    border: 2px solid rgb(168, 168, 168);
+}
+
+.view-button {
+    padding: 0.5rem;
+    border: 2px solid transparent;
+    border-radius: 3px;
+
+    background-color: var(--input-bg);
+
+    color: var(--text-color);
+
+    transition-duration: 200ms;
+
+    cursor: pointer;
+}
+
+.view-button:hover {
+    background-color: var(--input-bg-hover);
+}
+
+.success {
+    background-color: #8cffc0;
+    color: black;
+}
+
+.error {
+    background-color: rgb(255, 129, 129);
+}
+
+.error,
+.success {
+    color: black;
+    padding: 0.5rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+.error p,
+.success p {
+    margin: 0;
+}
+
+.options {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.title {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo {
+    width: 2rem;
+    height: 2rem;
+}
+
+@media screen and (max-width: 800px) {
+    body {
+        padding: 1rem;
+        box-sizing: border-box;
+    }
+}
