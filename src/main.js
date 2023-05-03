@@ -28,18 +28,19 @@ app.whenReady().then(() => {
     win.maximize()
 
     ipcMain.on('log', (_, name) => {
-        const frontendWin = new BrowserWindow({
-            title: config[name].name,
-            icon: `${__dirname}/assets/imgs/${config[name].icon}`,
-            width: 900,
-            height: 800,
-        })
         let path
         if (process.platform == "linux") {
             path = `${__dirname}/log/${name}.log`
         } else if (process.platform == "win32") {
             path = `${__dirname}\\log\\${name}.log`
         }
+        if (!fs.existsSync(path)) return
+        const frontendWin = new BrowserWindow({
+            title: config[name].name,
+            icon: `${__dirname}/assets/imgs/${config[name].icon}`,
+            width: 900,
+            height: 800,
+        })
         frontendWin.loadFile(path)
         let watcher = fs.watch(path, function (event, _) {
             if (event == 'change') {
@@ -160,7 +161,6 @@ function run_frontend_docker(name) {
 }
 
 const net = require('net');
-const { dirname } = require('path');
 function cehck_port(port) {
     return new Promise(resolve => {
         var sock = new net.Socket()
@@ -227,6 +227,5 @@ app.on("before-quit", async event => {
     }
     readyToQuite = true
     closeWin.close()
-    readyToQuite = true
     app.quit()
 })

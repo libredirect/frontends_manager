@@ -16,11 +16,17 @@ let frontends_running = {};
 (async () => {
     const config = await loadJSON("config.json")
     for (const key in config) {
-        if (!(process.platform == "linux" && config[key].command_linux) && !(process.platform == "win32" && config[key].command_windows) && !config[key].docker) continue
+        if (
+            !(process.platform == "linux" && config[key].command_linux)
+            &&
+            !(process.platform == "win32" && config[key].command_windows)
+            &&
+            !config[key].docker
+        ) continue
         const tile = document.createElement('div')
         tile.classList.add('tile')
         tile.innerHTML = `
-            <a href="http://${key}.localhost:8080" target="_blank">
+            <a id="${key}-link" href="http://${key}.localhost:8080" target="_blank">
                 <img src="assets/imgs/${config[key].icon}">
                 <h1>${config[key].name}</h1>
             </a>
@@ -56,11 +62,19 @@ let frontends_running = {};
 
         function running_buttons(name) {
             if (frontends_running[name]) {
+                document.getElementById(`${name}-link`).style.pointerEvents = ''
+                document.getElementById(`${name}-link`).style.userSelect = ''
+                document.getElementById(`${name}-link`).style.opacity = 1
                 document.getElementById(`${name}-run`).style.display = 'none'
                 document.getElementById(`${name}-close`).style.display = ''
+                document.getElementById(`${name}-log`).style.display = ''
             } else {
+                document.getElementById(`${name}-link`).style.pointerEvents = 'none'
+                document.getElementById(`${name}-link`).style.userSelect = 'none'
+                document.getElementById(`${name}-link`).style.opacity = .4
                 document.getElementById(`${name}-run`).style.display = ''
                 document.getElementById(`${name}-close`).style.display = 'none'
+                document.getElementById(`${name}-log`).style.display = 'none'
             }
         }
         frontends_running[key] = false
