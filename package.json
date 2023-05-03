@@ -20,14 +20,13 @@
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
     "node": "^19.8.1",
-    "docker-compose": "^0.23.19",
+    "docker-compose": "^0.24.0",
     "node-netstat": "^1.8.0",
     "pidusage": "^3.0.2"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.1.1",
     "@electron-forge/maker-deb": "^6.1.1",
-    "@electron-forge/maker-squirrel": "^6.1.1",
     "@electron-forge/maker-zip": "^6.1.1",
     "electron": "24.1.3"
   },

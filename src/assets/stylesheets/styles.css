@@ -63,6 +63,11 @@ div.body {
 
 .tile a {
 	text-decoration: none;
+	color: var(--active);
+}
+
+.tile a.underline:hover {
+	text-decoration: underline;
 }
 
 .tile h1 {
