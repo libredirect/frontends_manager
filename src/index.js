@@ -63,7 +63,7 @@ let frontends_running = {};
                 document.getElementById(`${name}-close`).style.display = 'none'
             }
         }
-        frontends_running[key] = true
+        frontends_running[key] = false
         document.getElementById(`${key}-run`).addEventListener("click", () => {
             ipcRenderer.invoke('run', key)
                 .then((msg) => {

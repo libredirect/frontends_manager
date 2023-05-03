@@ -8,4 +8,4 @@ services:
       - "127.0.0.1:10052:8080"
     environment:
       - "BASE_URL=http://localhost:10052/"
-      - "INSTANCE_NAME=my-instance"
+      - "INSTANCE_NAME=searxng"

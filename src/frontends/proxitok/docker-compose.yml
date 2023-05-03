@@ -10,14 +10,14 @@ services:
       - APP_URL=http://proxitok.localhost:8080
       - LATTE_CACHE=/cache
       - API_CACHE=redis
-      - REDIS_HOST=proxitok-redis
+      - REDIS_HOST=host.docker.internal
       - REDIS_PORT=6379
       - API_SIGNER=remote
       - API_SIGNER_URL=http://proxitok-signer:8080/signature
     volumes:
       - proxitok-cache:/cache
     depends_on:
-      - redis
+      # - redis
       - signer
     networks:
       - proxitok
@@ -29,22 +29,8 @@ services:
       - CHOWN
       - SETGID
       - SETUID
-
-  redis:
-    container_name: proxitok-redis
-    image: redis:7-alpine
-    command: redis-server --save 60 1 --loglevel warning
-    restart: unless-stopped
-    networks:
-      - proxitok
-    user: nobody
-    read_only: true
-    security_opt:
-      - no-new-privileges:true
-    tmpfs:
-      - /data:size=10M,mode=0770,uid=65534,gid=65534,noexec,nosuid,nodev
-    cap_drop:
-      - ALL
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   signer:
     container_name: proxitok-signer

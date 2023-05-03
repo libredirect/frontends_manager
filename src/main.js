@@ -1,15 +1,13 @@
-const { app, shell, BrowserWindow, Menu, Tray, ipcMain, webContents } = require('electron')
+const { app, shell, BrowserWindow, Menu, Tray, ipcMain } = require('electron')
 const dockerCompose = require('docker-compose');
 const fs = require('fs');
 
 let showWin = true
-if (!fs.existsSync('./log')) fs.mkdirSync('./log');
 let frontendsProcesses = {}
 let frontendsProcessesDocker = []
-console.log('Hello weird Arsen!')
 app.whenReady().then(() => {
     const win = new BrowserWindow({
-        icon: 'assets/imgs/libredirect-256.png',
+        icon: `${__dirname}/assets/imgs/icon.png`,
         width: 1200,
         height: 800,
         webPreferences: {
@@ -27,22 +25,22 @@ app.whenReady().then(() => {
         return { action: 'allow' }
     })
     // win.removeMenu()
+    win.maximize()
 
     ipcMain.on('log', (_, name) => {
         const frontendWin = new BrowserWindow({
             title: config[name].name,
-            icon: `assets/imgs/${config[name].icon}`,
+            icon: `${__dirname}/assets/imgs/${config[name].icon}`,
             width: 900,
             height: 800,
         })
         let path
         if (process.platform == "linux") {
-            path = `log/${name}.log`
+            path = `${__dirname}/log/${name}.log`
         } else if (process.platform == "win32") {
-            path = `log\\${name}.log`
+            path = `${__dirname}\\log\\${name}.log`
         }
         frontendWin.loadFile(path)
-
         let watcher = fs.watch(path, function (event, _) {
             if (event == 'change') {
                 frontendWin.reload()
@@ -66,7 +64,7 @@ app.whenReady().then(() => {
         return false
     })
 
-    const trayIcon = new Tray(`${__dirname}/assets/imgs/libredirect-256.png`)
+    const trayIcon = new Tray(`${__dirname}/assets/imgs/icon.png`)
     const contextMenu = Menu.buildFromTemplate([
         { label: 'Show', type: 'normal', click: () => { showWin = true; win.show(); } },
         { label: 'Hide', type: 'normal', click: () => { showWin = false; win.hide(); } },
@@ -101,7 +99,11 @@ function getEnv(env) {
 }
 
 const { spawn } = require('child_process')
-if (!fs.existsSync('./log')) fs.mkdirSync('./log');
+const logPath = `${__dirname}/log`
+if (!fs.existsSync(logPath)) fs.mkdirSync(logPath);
+for (const file of fs.readdirSync(logPath)) {
+    fs.unlinkSync(`${logPath}/${file}`);
+}
 function run_frontend(name, command, args, env) {
     return new Promise(resolve => {
         let child
@@ -118,18 +120,18 @@ function run_frontend(name, command, args, env) {
                 child = spawn(command, args, { cwd: __dirname + `\\frontends\\${name}` })
             }
         }
-        resolve()
         frontendsProcesses[name] = child
         let path
         if (process.platform == "linux") {
-            path = `log/${name}.log`
+            path = `${__dirname}/log/${name}.log`
         } else if (process.platform == "win32") {
-            path = `log\\${name}.log`
+            path = `${__dirname}\\log\\${name}.log`
         }
         fs.writeFileSync(path, '');
         child.stdout.setEncoding('utf8')
         child.stderr.on('data', chunk => fs.appendFileSync(path, chunk));
         child.stdout.on('data', chunk => fs.appendFileSync(path, chunk))
+        resolve()
     })
 
 }
@@ -142,9 +144,9 @@ function run_frontend_docker(name) {
                     frontendsProcessesDocker.push(name)
                     let path
                     if (process.platform == "linux") {
-                        path = `log/${name}.log`
+                        path = `${__dirname}/log/${name}.log`
                     } else if (process.platform == "win32") {
-                        path = `log\\${name}.log`
+                        path = `${__dirname}\\log\\${name}.log`
                     }
                     fs.writeFileSync(path, '');
                     fs.appendFileSync(path, result.out);
@@ -191,14 +193,14 @@ for (const key in config) {
 (async () => {
     if (process.platform == "linux") {
         run_frontend('caddy', './caddy_linux_amd64', ['run'])
-        run_frontend('redis', './redis-stable/src/redis-server', [])
+        run_frontend('redis', './redis-stable/src/redis-server', ['./redis.conf'])
         while (!(await cehck_port(6379))) { }
     } else if (process.platform == "win32") {
         run_frontend('caddy', '.\\caddy_windows_amd64.exe', ['run'])
     }
-    for (const k of Object.keys(run_frontends)) {
-        run_frontends[k]()
-    }
+    // for (const k of Object.keys(run_frontends)) {
+    //     run_frontends[k]()
+    // }
 })();
 
 let readyToQuite = false
@@ -206,7 +208,7 @@ app.on("before-quit", async event => {
     if (readyToQuite) return
     event.preventDefault();
     const closeWin = new BrowserWindow({
-        icon: 'assets/imgs/libredirect-256.png',
+        icon: `${__dirname}/assets/imgs/icon.png`,
         width: 400,
         height: 200,
         webPreferences: {
@@ -216,6 +218,7 @@ app.on("before-quit", async event => {
     })
     closeWin.loadFile(`${__dirname}/closing.html`)
     closeWin.removeMenu()
+    closeWin.resizable = false
     for (const name of Object.keys(frontendsProcesses)) {
         frontendsProcesses[name].kill('SIGINT');
     }
