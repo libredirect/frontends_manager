@@ -25,7 +25,7 @@ For Managing the frontends:
 - Complex frontends: [Docker](https://www.docker.com/)
 
 ## Development Linux
-Install [Docker Compose](https://docs.docker.com/desktop/install/linux-install/)
+Install [Docker](https://www.docker.com/)
 ```bash
 sudo snap install node --channel=14/stable --classic # Newer versions aren't working
 git clone --depth 1 https://github.com/libredirect/frontends_manager
@@ -35,7 +35,7 @@ npm run start
 ```
 
 ## Development Windows
-Install [Docker Compose](https://docs.docker.com/desktop/install/windows-install/)\
+Install [Docker](https://www.docker.com/)\
 Install [Node.js v18](https://nodejs.org/en/download)
 ```bash
 git clone --depth 1 https://github.com/libredirect/frontends_manager
