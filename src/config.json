@@ -15,7 +15,18 @@
         "command_linux": "./rimgo_linux_x86_64",
         "command_windows": ".\\rimgo_windows_x86_64.exe",
         "args": [],
-        "env": "ADDRESS=127.0.0.1, PORT=10042, FIBER_PREFORK=false, IMGUR_CLIENT_ID=546c25a59c58ad7, PRIVACY_CLOUDFLARE=false, PRIVACY_NOT_COLLECTED=false, PRIVACY_IP=false, PRIVACY_URL=false, PRIVACY_DEVICE=false, PRIVACY_DIAGNOSTICS=false"
+        "env": [
+            "ADDRESS=127.0.0.1",
+            "PORT=10042",
+            "FIBER_PREFORK=false",
+            "IMGUR_CLIENT_ID=546c25a59c58ad7",
+            "PRIVACY_CLOUDFLARE=false",
+            "PRIVACY_NOT_COLLECTED=false",
+            "PRIVACY_IP=false",
+            "PRIVACY_URL=false",
+            "PRIVACY_DEVICE=false",
+            "PRIVACY_DIAGNOSTICS=false"
+        ]
     },
     "anonymousoverflow": {
         "name": "AnonymousOverflow",
@@ -23,7 +34,12 @@
         "command_linux": "./anonymousoverflow_linux_x86_64",
         "command_windows": ".\\anonymousoverflow_windows_x86_64.exe",
         "args": [],
-        "env": "APP_URL=http://anonymousoverflow.localhost:8080, JWT_SIGNING_SECRET=secret, PORT=10046, HOST=127.0.0.1"
+        "env": [
+            "APP_URL=http://anonymousoverflow.localhost:8080",
+            "JWT_SIGNING_SECRET=secret",
+            "PORT=10046",
+            "HOST=127.0.0.1"
+        ]
     },
     "simplytranslate": {
         "name": "SimplyTranslate",
@@ -43,7 +59,9 @@
         "command_linux": "./dumb_linux_x86_64",
         "command_windows": ".\\dumb_windows_x86_64.exe",
         "args": [],
-        "env": "PORT=10047"
+        "env": [
+            "PORT=10047"
+        ]
     },
     "biblioreads": {
         "name": "BiblioReads",

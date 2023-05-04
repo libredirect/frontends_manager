@@ -1,4 +1,4 @@
-cd frontends/
+cd src/frontends/
 sh libreddit/build.sh
 sh nitter/build.sh
 sh rimgo/build.sh

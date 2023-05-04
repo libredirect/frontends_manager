@@ -1,47 +1,42 @@
 const { app, shell, BrowserWindow, Menu, Tray, ipcMain } = require('electron')
-const { v2 } = require('docker-compose');
-const dockerCompose = v2;
+const docker = require('./services/docker')
+const executable = require('./services/executable')
+const utils = require('./services/utils')
 const fs = require('fs');
+const path = require('path');
 
+const logPath = app.getPath('logs')
 let showWin = true
-let frontendsProcesses = {}
-let frontendsProcessesDocker = []
+
 app.whenReady().then(() => {
     (async () => {
-        try {
-            if ((await dockerCompose.version()).err === '') isDockerInstalled = true
-        } catch (_) { }
-
+        isDockerInstalled = await docker.health()
         for (const key in config) {
             const val = config[key]
             if (!val.docker) {
                 if (process.platform == "linux" && val.command_linux) {
-                    run_frontends[key] = () => run_frontend(key, val.command_linux, val.args, val.env)
+                    run_frontends[key] = () => executable.run_frontend(key, val.command_linux, val.args, val.env)
                 } else if (process.platform == "win32" && val.command_windows) {
-                    run_frontends[key] = () => run_frontend(key, val.command_windows, val.args, val.env)
+                    run_frontends[key] = () => executable.run_frontend(key, val.command_windows, val.args, val.env)
                 }
             } else if (isDockerInstalled) {
-                run_frontends[key] = () => run_frontend_docker(key)
+                run_frontends[key] = () => docker.run_frontend(key)
             }
         }
         if (process.platform == "linux") {
-            run_frontend('caddy', './caddy_linux_amd64', ['run'])
-            run_frontend('redis', './redis-stable/src/redis-server', ['./redis.conf'])
-            while (!(await cehck_port(6379))) { }
+            executable.run_frontend('caddy', './caddy_linux_amd64', ['run'])
+            executable.run_frontend('redis', './redis-stable/src/redis-server', ['./redis.conf'])
+            while (!(await utils.check_port(6379))) { } // waiting for redis...
         } else if (process.platform == "win32") {
-            run_frontend('caddy', '.\\caddy_windows_amd64.exe', ['run'])
+            executable.run_frontend('caddy', '.\\caddy_windows_amd64.exe', ['run'])
         }
 
         const win = new BrowserWindow({
-            icon: `${__dirname}/assets/imgs/icon.png`,
-            width: 1200,
-            height: 800,
-            webPreferences: {
-                nodeIntegration: true,
-                contextIsolation: false,
-            },
+            icon: path.join(__dirname, 'assets', 'imgs', 'icon.png'),
+            width: 1200, height: 800,
+            webPreferences: { nodeIntegration: true, contextIsolation: false },
         })
-        win.loadFile(`${__dirname}/index.html`)
+        win.loadFile(path.join(__dirname, 'index.html'))
 
         win.webContents.setWindowOpenHandler(({ url }) => {
             if (url.startsWith('http')) {
@@ -54,24 +49,17 @@ app.whenReady().then(() => {
         win.maximize()
 
         ipcMain.on('log', (_, name) => {
-            let path
-            if (process.platform == "linux") {
-                path = `${__dirname}/log/${name}.log`
-            } else if (process.platform == "win32") {
-                path = `${__dirname}\\log\\${name}.log`
-            }
-            if (!fs.existsSync(path)) return
+            const _path = path.join(logPath, `${name}.log`)
+            if (!fs.existsSync(_path)) return
             const frontendWin = new BrowserWindow({
                 title: config[name].name,
-                icon: `${__dirname}/assets/imgs/${config[name].icon}`,
-                width: 900,
-                height: 800,
+                icon: path.join(__dirname, 'assets', 'imgs', config[name].icon),
+                width: 900, height: 800,
             })
-            frontendWin.loadFile(path)
-            let watcher = fs.watch(path, function (event, _) {
-                if (event == 'change') {
-                    frontendWin.reload()
-                }
+            frontendWin.loadFile(_path)
+            let watcher = fs.watch(_path, function (event, _) {
+                if (event == 'change') frontendWin.reload()
+                else frontendWin.close()
             });
             frontendWin.on("close", () => watcher.close())
         })
@@ -82,11 +70,10 @@ app.whenReady().then(() => {
         })
 
         ipcMain.handle('close', async (_, name) => {
-            if (name in frontendsProcesses) {
-                frontendsProcesses[name].kill('SIGINT');
-            }
-            else if (frontendsProcessesDocker.includes(name)) {
-                const r = await dockerCompose.stop({ cwd: `${__dirname}/frontends/${name}`, log: true });
+            if (config[name].docker) {
+                await docker.stop_frontend(name)
+            } else {
+                executable.stop_frontend(name)
             }
             return false
         })
@@ -95,7 +82,7 @@ app.whenReady().then(() => {
             return isDockerInstalled;
         })
 
-        const trayIcon = new Tray(`${__dirname}/assets/imgs/icon.png`)
+        const trayIcon = new Tray(path.join(__dirname, 'assets', 'imgs', 'icon.png'))
         const contextMenu = Menu.buildFromTemplate([
             { label: 'Show', type: 'normal', click: () => { showWin = true; win.show(); } },
             { label: 'Hide', type: 'normal', click: () => { showWin = false; win.hide(); } },
@@ -120,95 +107,8 @@ app.whenReady().then(() => {
     })();
 })
 
-function getEnv(env) {
-    var properties = env.split(', ');
-    var obj = {};
-    properties.forEach(function (property) {
-        var tup = property.split('=');
-        obj[tup[0]] = tup[1];
-    });
-    return obj
-}
-
-const { spawn } = require('child_process')
-const logPath = `${__dirname}/log`
-if (!fs.existsSync(logPath)) fs.mkdirSync(logPath);
-for (const file of fs.readdirSync(logPath)) {
-    fs.unlinkSync(`${logPath}/${file}`);
-}
-function run_frontend(name, command, args, env) {
-    return new Promise(resolve => {
-        let child
-        if (env) {
-            if (process.platform == "linux") {
-                child = spawn(command, args, { cwd: `${__dirname}/frontends/${name}`, env: getEnv(env) })
-            } else if (process.platform == "win32") {
-                child = spawn(command, args, { cwd: `${__dirname}\\frontends\\${name}`, env: getEnv(env) })
-            }
-        } else {
-            if (process.platform == "linux") {
-                child = spawn(command, args, { cwd: `${__dirname}/frontends/${name}` })
-            } else if (process.platform == "win32") {
-                child = spawn(command, args, { cwd: `{__dirname}\\frontends\\${name}` })
-            }
-        }
-        frontendsProcesses[name] = child
-        let path
-        if (process.platform == "linux") {
-            path = `${__dirname}/log/${name}.log`
-        } else if (process.platform == "win32") {
-            path = `${__dirname}\\log\\${name}.log`
-        }
-        fs.writeFileSync(path, '');
-        child.stdout.setEncoding('utf8')
-        child.stderr.on('data', chunk => fs.appendFileSync(path, chunk));
-        child.stdout.on('data', chunk => fs.appendFileSync(path, chunk))
-        resolve()
-    })
-
-}
-function run_frontend_docker(name) {
-    return new Promise(resolve => {
-        dockerCompose.upAll({ cwd: `${__dirname}/frontends/${name}`, log: true })
-            .then(
-                result => {
-                    resolve()
-                    frontendsProcessesDocker.push(name)
-                    let path
-                    if (process.platform == "linux") {
-                        path = `${__dirname}/log/${name}.log`
-                    } else if (process.platform == "win32") {
-                        path = `${__dirname}\\log\\${name}.log`
-                    }
-                    fs.writeFileSync(path, '');
-                    fs.appendFileSync(path, result.out);
-                    fs.appendFileSync(path, result.err);
-                },
-                err => {
-                    resolve(false)
-                    console.log('something went wrong:', err.message)
-                }
-            );
-    })
-}
-
-const net = require('net');
-function cehck_port(port) {
-    return new Promise(resolve => {
-        var sock = new net.Socket()
-        sock.setTimeout(2500)
-        sock
-            .on('connect', () => {
-                sock.destroy()
-                resolve(true)
-            })
-            .on('error', () => resolve(false))
-            .connect(port, '127.0.0.1')
-    })
-}
-
 let run_frontends = {}
-const config = JSON.parse(fs.readFileSync(`${__dirname}/config.json`))
+const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json')))
 let isDockerInstalled = false;
 
 
@@ -217,23 +117,15 @@ app.on("before-quit", async event => {
     if (readyToQuite) return
     event.preventDefault();
     const closeWin = new BrowserWindow({
-        icon: `${__dirname}/assets/imgs/icon.png`,
-        width: 400,
-        height: 200,
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-        },
+        icon: path.join(__dirname, 'assets', 'imgs', 'icon.png'),
+        width: 400, height: 200,
+        webPreferences: { nodeIntegration: true, contextIsolation: false },
     })
-    closeWin.loadFile(`${__dirname}/closing.html`)
+    closeWin.loadFile(path.join(__dirname, 'closing.html'))
     closeWin.removeMenu()
     closeWin.resizable = false
-    for (const name of Object.keys(frontendsProcesses)) {
-        frontendsProcesses[name].kill('SIGINT');
-    }
-    for (const name of frontendsProcessesDocker) {
-        await dockerCompose.stop({ cwd: `${__dirname}/frontends/${name}`, log: true })
-    }
+    executable.stop_all()
+    docker.stop_all()
     readyToQuite = true
     closeWin.close()
     app.quit()
