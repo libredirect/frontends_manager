@@ -32,8 +32,14 @@ let frontends_running = {};
                 <h1>${config[key].name}</h1>
             </a>
             `;
-        if (config[key].docker && !isDockerInstalled) {
+        if (config[key].docker && isDockerInstalled == false) {
             tile.innerHTML += 'Requires <a class="underline" href="https://www.docker.com" target="_blank">Docker</a>'
+            document.getElementById("frontends").appendChild(tile)
+            document.getElementById(`${key}-link`).style.pointerEvents = 'none'
+            document.getElementById(`${key}-link`).style.userSelect = 'none'
+            document.getElementById(`${key}-link`).style.opacity = .4
+        } else if (config[key].docker && isDockerInstalled == 'not_running') {
+            tile.innerHTML += 'Docker Not Running'
             document.getElementById("frontends").appendChild(tile)
             document.getElementById(`${key}-link`).style.pointerEvents = 'none'
             document.getElementById(`${key}-link`).style.userSelect = 'none'
@@ -65,19 +71,18 @@ let frontends_running = {};
             `
             document.getElementById("frontends").appendChild(tile)
             document.getElementById(`${key}-run`).addEventListener("click", () => {
-                ipcRenderer.invoke('run', key)
-                    .then((msg) => {
-                        frontends_running[key] = msg;
-                        running_buttons(key)
-                    })
+                ipcRenderer.invoke('run', key).then(result => {
+                    frontends_running[key] = result;
+                    running_buttons(key)
+                })
                 document.getElementById(`${key}-run`).getElementsByTagName('span')[0].innerHTML = "Be patient it's not broken..."
                 document.getElementById(`${key}-run`).style.pointerEvents = 'none'
                 document.getElementById(`${key}-run`).style.userSelect = 'none'
                 document.getElementById(`${key}-run`).style.opacity = .4
             })
             document.getElementById(`${key}-close`).addEventListener("click", () => {
-                ipcRenderer.invoke('close', key).then((msg) => {
-                    frontends_running[key] = msg;
+                ipcRenderer.invoke('close', key).then(result => {
+                    frontends_running[key] = result;
                     running_buttons(key)
                 })
                 document.getElementById(`${key}-close`).getElementsByTagName('span')[0].innerHTML = "Closing..."
@@ -91,29 +96,37 @@ let frontends_running = {};
 
             frontends_running[key] = false
             function running_buttons(name) {
-                if (frontends_running[name]) {
-                    document.getElementById(`${name}-link`).style.pointerEvents = ''
-                    document.getElementById(`${name}-link`).style.userSelect = ''
-                    document.getElementById(`${name}-link`).style.opacity = 1
-                    document.getElementById(`${name}-run`).style.display = 'none'
-                    document.getElementById(`${name}-run`).style.display = 'none'
-                    document.getElementById(`${key}-run`).getElementsByTagName('span')[0].innerHTML = "Run"
-                    document.getElementById(`${name}-run`).style.pointerEvents = ''
-                    document.getElementById(`${name}-run`).style.userSelect = ''
-                    document.getElementById(`${name}-run`).style.opacity = 1
-                    document.getElementById(`${name}-close`).style.display = ''
-                    document.getElementById(`${name}-log`).style.display = ''
-                } else {
-                    document.getElementById(`${name}-link`).style.pointerEvents = 'none'
-                    document.getElementById(`${name}-link`).style.userSelect = 'none'
-                    document.getElementById(`${name}-link`).style.opacity = .4
-                    document.getElementById(`${name}-run`).style.display = ''
-                    document.getElementById(`${key}-close`).getElementsByTagName('span')[0].innerHTML = "Close"
-                    document.getElementById(`${name}-close`).style.pointerEvents = ''
-                    document.getElementById(`${name}-close`).style.userSelect = ''
-                    document.getElementById(`${name}-close`).style.opacity = 1
-                    document.getElementById(`${name}-close`).style.display = 'none'
-                    document.getElementById(`${name}-log`).style.display = 'none'
+                const linkElement = document.getElementById(`${name}-link`)
+                const runElement = document.getElementById(`${name}-run`)
+                const closeElement = document.getElementById(`${name}-close`)
+                const logElement = document.getElementById(`${name}-log`)
+                if (frontends_running[name] == 'error') {
+                    runElement.getElementsByTagName('span')[0].innerHTML = "Error..."
+                    runElement.style.pointerEvents = ''
+                    runElement.style.userSelect = ''
+                    runElement.style.opacity = 1
+                } else if (frontends_running[name] == true) {
+                    linkElement.style.pointerEvents = ''
+                    linkElement.style.userSelect = ''
+                    linkElement.style.opacity = 1
+                    runElement.style.display = 'none'
+                    runElement.getElementsByTagName('span')[0].innerHTML = "Run"
+                    runElement.style.pointerEvents = ''
+                    runElement.style.userSelect = ''
+                    runElement.style.opacity = 1
+                    closeElement.style.display = ''
+                    logElement.style.display = ''
+                } else if (frontends_running[name] == false) {
+                    linkElement.style.pointerEvents = 'none'
+                    linkElement.style.userSelect = 'none'
+                    linkElement.style.opacity = .4
+                    runElement.style.display = ''
+                    closeElement.getElementsByTagName('span')[0].innerHTML = "Close"
+                    closeElement.style.pointerEvents = ''
+                    closeElement.style.userSelect = ''
+                    closeElement.style.opacity = 1
+                    closeElement.style.display = 'none'
+                    logElement.style.display = 'none'
                 }
             }
             running_buttons(key)

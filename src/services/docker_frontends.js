@@ -28,7 +28,7 @@ function run_frontend(name) {
         dockerCompose.upAll({ cwd: path.join(basepath, 'frontends', name) })
             .then(
                 result => {
-                    resolve()
+                    resolve(true)
                     frontendsProcessesDocker.push(name)
                     const _path = path.join(logPath, `${name}.log`)
                     fs.writeFileSync(_path, '');
@@ -36,7 +36,7 @@ function run_frontend(name) {
                     fs.appendFileSync(_path, result.err);
                 },
                 err => {
-                    resolve(false)
+                    resolve('error')
                     console.log(`Docker ${name} couldn't run: ${err.message}`)
                 }
             );
@@ -53,11 +53,18 @@ function health() {
     return new Promise(async resolve => {
         try {
             if ((await dockerCompose.version()).err === '') {
-                resolve(true);
-                return
+                try {
+                    if ((await dockerCompose.ps({ cwd: path.join(basepath, 'frontends', 'biblioreads') })).err === '') {
+                        resolve(true)
+                    }
+                } catch (error) {
+                    resolve('not_running')
+                }
+
+            } else {
+                resolve(false)
             }
-        } catch (_) { }
-        resolve(false)
+        } catch (_) { resolve(false) }
     })
 }
 exports.health = health

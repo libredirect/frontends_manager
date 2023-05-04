@@ -1,16 +1,16 @@
 const { app, shell, BrowserWindow, Menu, Tray, ipcMain } = require('electron')
-const docker = require('./services/docker')
-const executable = require('./services/executable')
+const path = require('path');
+const docker = require('./services/docker_frontends')
+const executable = require('./services/binary_frontends')
 const utils = require('./services/utils')
 const fs = require('fs');
-const path = require('path');
 
 const logPath = app.getPath('logs')
 let showWin = true
 
 app.whenReady().then(() => {
     (async () => {
-        isDockerInstalled = await docker.health()
+        const dockerHealth = await docker.health()
         for (const key in config) {
             const val = config[key]
             if (!val.docker) {
@@ -19,7 +19,7 @@ app.whenReady().then(() => {
                 } else if (process.platform == "win32" && val.command_windows) {
                     run_frontends[key] = () => executable.run_frontend(key, val.command_windows, val.args, val.env)
                 }
-            } else if (isDockerInstalled) {
+            } else {
                 run_frontends[key] = () => docker.run_frontend(key)
             }
         }
@@ -64,9 +64,8 @@ app.whenReady().then(() => {
             frontendWin.on("close", () => watcher.close())
         })
 
-        ipcMain.handle('run', async (_, name) => {
-            await run_frontends[name]();
-            return true
+        ipcMain.handle('run', async (event, name) => {
+            return await run_frontends[name]();
         })
 
         ipcMain.handle('close', async (_, name) => {
@@ -78,9 +77,8 @@ app.whenReady().then(() => {
             return false
         })
 
-        ipcMain.handle('isDockerInstalled', async () => {
-            return isDockerInstalled;
-        })
+       
+        ipcMain.handle('isDockerInstalled', () => dockerHealth)
 
         const trayIcon = new Tray(path.join(__dirname, 'assets', 'imgs', 'icon.png'))
         const contextMenu = Menu.buildFromTemplate([
@@ -109,8 +107,6 @@ app.whenReady().then(() => {
 
 let run_frontends = {}
 const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json')))
-let isDockerInstalled = false;
-
 
 let readyToQuite = false
 app.on("before-quit", async event => {

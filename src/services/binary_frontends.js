@@ -26,7 +26,7 @@ function run_frontend(name, command, args, env) {
         child.stdout.setEncoding('utf8')
         child.stderr.on('data', chunk => fs.appendFileSync(_path, chunk));
         child.stdout.on('data', chunk => fs.appendFileSync(_path, chunk))
-        resolve()
+        resolve(true)
     })
 }
 exports.run_frontend = run_frontend
