@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  redis:
+    image: docker.io/_/redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    command: redis-server
+    volumes: 
+      - cache:/data
+volumes:
+  cache:
+    driver: local

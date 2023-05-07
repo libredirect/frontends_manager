@@ -1,0 +1,15 @@
+version: '3'
+services:
+  libremdb:
+    container_name: libremdb
+    image: quay.io/pussthecatorg/libremdb:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:10051:3000"
+    environment:
+      - "NEXT_PUBLIC_URL='http://libremdb.localhost:8080'"
+      - "AXIOS_USERAGENT='Mozilla/5.0 (Windows NT 10.0; rv:112.0) Gecko/20100101 Firefox/112.0'"
+      - "AXIOS_ACCEPT='text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8'"
+      - "NEXT_TELEMETRY_DISABLED=1"
+      - "USE_REDIS=true"
+      - "REDIS_URL=localhost:6379"

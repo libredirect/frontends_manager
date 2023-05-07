@@ -1,0 +1,10 @@
+version: "3"
+services:
+  biblioreads:    
+    container_name: biblioreads
+    image: docker.io/nesaku/biblioreads:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:10048:3000"
+    environment:
+      - "NEXT_TELEMETRY_DISABLED=1"

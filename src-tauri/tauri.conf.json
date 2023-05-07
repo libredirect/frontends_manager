@@ -1,0 +1,119 @@
+{
+  "build": {
+    "beforeDevCommand": "",
+    "beforeBuildCommand": "",
+    "devPath": "../src",
+    "distDir": "../src",
+    "withGlobalTauri": true
+  },
+  "package": {
+    "productName": "libredirect_frontends_manager",
+    "version": "0.0.4"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": false,
+      "fs": {
+        "all": true,
+        "scope": [
+          "$RESOURCE/*"
+        ]
+      },
+      "os": {
+        "all": true
+      },
+      "shell": {
+        "all": true,
+        "scope": [
+          {
+            "name": "./caddy_linux_amd64",
+            "cmd": "./caddy_linux_amd64",
+            "args": true
+          },
+          {
+            "name": "./redis-stable/src/redis-server",
+            "cmd": "./redis-stable/src/redis-server",
+            "args": true
+          },
+          {
+            "name": "./libreddit_linux_x86_64",
+            "cmd": "./libreddit_linux_x86_64",
+            "args": true
+          },
+          {
+            "name": "./rimgo_linux_x86_64",
+            "cmd": "./rimgo_linux_x86_64",
+            "args": true
+          },
+          {
+            "name": "./anonymousoverflow_linux_x86_64",
+            "cmd": "./anonymousoverflow_linux_x86_64",
+            "args": true
+          },
+          {
+            "name": "./simplytranslate_linux_x86_64",
+            "cmd": "./simplytranslate_linux_x86_64",
+            "args": true
+          },
+          {
+            "name": "./nitter_linux_x86_64",
+            "cmd": "./nitter_linux_x86_64",
+            "args": true
+          },
+          {
+            "name": "./dumb_linux_x86_64",
+            "cmd": "./dumb_linux_x86_64",
+            "args": true
+          },
+          {
+            "name": "docker",
+            "cmd": "docker",
+            "args": true
+          }
+        ]
+      },
+      "window": {
+        "all": true
+      },
+      "path": {
+        "all": true
+      }
+    },
+    "bundle": {
+      "active": true,
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
+      ],
+      "identifier": "org.libredirect.frontends-manager",
+      "targets": "all",
+      "resources": [
+        "frontends.json",
+        "docker_frontends/*",
+        "binary_frontends/*"
+      ]
+    },
+    "security": {
+      "csp": null
+    },
+    "updater": {
+      "active": false
+    },
+    "windows": [
+      {
+        "fullscreen": false,
+        "resizable": true,
+        "title": "Libredirect Frontends Manager",
+        "width": 1200,
+        "height": 800
+      }
+    ],
+    "systemTray": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
+    }
+  }
+}
