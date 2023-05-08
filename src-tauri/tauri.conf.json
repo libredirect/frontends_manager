@@ -81,6 +81,11 @@
             "name": "chmod",
             "cmd": "chmod",
             "args": true
+          },
+          {
+            "name": "tar",
+            "cmd": "tar",
+            "args": true
           }
         ]
       },

@@ -17,7 +17,10 @@ let frontends_running = {};
     else if (platform == "win32") {
         await binary_frontends.run_caddy('windows')
     }
-    docker_frontends.run_frontend('redis')
+    if (isDockerInstalled == 'running'){
+        await docker_frontends.download_frontend('redis')
+        await docker_frontends.run_frontend('redis')
+    }
     for (const key in config) {
         if (
             !(platform == "linux" && config[key].command_linux)

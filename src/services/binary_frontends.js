@@ -39,11 +39,7 @@ async function run_caddy(platform) {
 }
 
 async function run_frontend(name, command, args, env) {
-    if (platform == 'linux') {
-        const cmd = new shell.Command('chmod', ['u+x', command], { cwd: await path.appDataDir(), env: formatEnv(env) })
-        await cmd.spawn();
-    }
-    const cmd = new shell.Command(command, args, { cwd: await path.appDataDir(), env: formatEnv(env) })
+    const cmd = new shell.Command(command, args, { cwd: await path.join(await path.appDataDir(), name), env: formatEnv(env) })
     cmd.on('error', error => {
         console.error(`command error: "${error}"`)
         return 'downloaded'
@@ -54,24 +50,34 @@ async function run_frontend(name, command, args, env) {
 }
 
 async function download_frontend(name) {
-    const response = await http.fetch(`https://github.com/libredirect/frontends_binaries/raw/main/${name}/${name}_${platform}_x86_64`, {
-        method: 'GET',
-        timeout: 30,
-        responseType: http.ResponseType.Binary
-    });
-    await fs.writeBinaryFile(`${name}_${platform}_x86_64`, new Uint8Array(response.data), { dir: fs.BaseDirectory.AppData });
+    let filename
+    if (platform == 'linux') {
+        filename = `${name}_linux_x86_64.tar.gz`
+    } else if (platform == 'windows') {
+        filename = `${name}_windows_x86_64.zip`
+    }
+    const response = await http.fetch(
+        `https://github.com/libredirect/frontends_binaries/raw/main/binaries/${filename}`,
+        { method: 'GET', responseType: http.ResponseType.Binary }
+    );
+    await fs.writeBinaryFile(filename, new Uint8Array(response.data), { dir: fs.BaseDirectory.AppData });
+    if (platform == 'linux') {
+        const extract_cmd = new shell.Command('tar', ['-xzf', filename], { cwd: await path.appDataDir() })
+        await extract_cmd.spawn();
+        extract_cmd.on('close', async () => await fs.removeFile(filename, { dir: fs.BaseDirectory.AppData }));
+    }
     return 'downloaded'
 }
 
 async function check_downloaded(name) {
-    if (await fs.exists(`${name}_${platform}_x86_64`, { dir: fs.BaseDirectory.AppData })) {
+    if (await fs.exists(`${name}`, { dir: fs.BaseDirectory.AppData })) {
         return 'downloaded'
     } else {
         return 'not_downloaded'
     }
 }
 async function remove_frontend(name) {
-    await fs.removeFile(`${name}_${platform}_x86_64`, { dir: fs.BaseDirectory.AppData })
+    await fs.removeDir(name, { dir: fs.BaseDirectory.AppData, recursive: true })
     return 'not_downloaded'
 }
 
