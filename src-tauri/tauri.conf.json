@@ -13,10 +13,17 @@
   "tauri": {
     "allowlist": {
       "all": false,
+      "http": {
+        "all": true,
+        "scope": [
+          "https://github.com/libredirect/frontends_binaries/raw/main/*"
+        ]
+      },
       "fs": {
         "all": true,
         "scope": [
-          "$RESOURCE/*"
+          "$RESOURCE/*",
+          "$APPDATA/*"
         ]
       },
       "os": {
@@ -69,6 +76,11 @@
             "name": "docker",
             "cmd": "docker",
             "args": true
+          },
+          {
+            "name": "chmod",
+            "cmd": "chmod",
+            "args": true
           }
         ]
       },
@@ -93,11 +105,8 @@
       "resources": [
         "frontends.json",
         "docker_frontends/*",
-        "binary_frontends/*"
+        "caddy/*"
       ]
-    },
-    "security": {
-      "csp": null
     },
     "updater": {
       "active": false

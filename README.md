@@ -28,7 +28,7 @@ Install [Rust](https://www.rust-lang.org/)\
 Install [Tauri](https://tauri.app/)\
 Install [Docker](https://www.docker.com/)
 ```bash
-git clone --depth 1 https://github.com/libredirect/frontends_manager
+git clone https://github.com/libredirect/frontends_manager
 cd frontends_manager
 npm install
 npm run tauri dev

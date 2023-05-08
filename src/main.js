@@ -2,8 +2,6 @@ const { app, shell, BrowserWindow, Menu, Tray } = require('electron')
 const path = require('path');
 const docker = require('./services/docker_frontends')
 const executable = require('./services/binary_frontends')
-const utils = require('./services/utils')
-const fs = require('fs');
 
 let readyToQuite = false
 app.on("before-quit", async event => {

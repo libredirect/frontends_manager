@@ -8,56 +8,54 @@ async function docker_command(name, action) {
     return new shell.Command('docker', ['compose', '-f', `${name}.yml`, action], { cwd: await path.resolveResource('docker_frontends') })
 }
 
-async function install_frontend(name) {
+async function download_frontend(name) {
     return new Promise(async resolve => {
-        const cmd = docker_command(name, 'create')
+        const cmd = await docker_command(name, 'create')
         cmd.on('error', error => { console.error(`command error: "${error}"`); resolve(false) });
         cmd.on('close', data => {
             console.log(`command finished with code ${data.code} and signal ${data.signal}`)
-            resolve(true)
+            resolve('downloaded')
         });
         await cmd.spawn()
-        frontendsProcessesDocker.push(name)
-        resolve(true)
     })
 }
 
 async function run_frontend(name) {
     return new Promise(async resolve => {
-        const cmd = docker_command(name, 'up')
+        const cmd = await docker_command(name, 'start')
         cmd.on('error', error => { console.error(`command error: "${error}"`); resolve(false) });
         cmd.on('close', data => {
             console.log(`command finished with code ${data.code} and signal ${data.signal}`)
-            resolve(true)
+            frontendsProcessesDocker.push(name)
+            resolve('running')
         });
         await cmd.spawn()
-        frontendsProcessesDocker.push(name)
     })
 
 }
 async function stop_frontend(name) {
     return new Promise(async resolve => {
-        const cmd = docker_command(name, 'stop')
+        const cmd = await docker_command(name, 'stop')
         cmd.on('error', error => { console.error(`command error: "${error}"`); resolve(true) });
         cmd.on('close', data => {
             console.log(`command finished with code ${data.code} and signal ${data.signal}`)
-            resolve(false)
+            frontendsProcessesDocker.splice(frontendsProcessesDocker.indexOf(name), 1)
+            resolve('downloaded')
         });
         await cmd.spawn()
+
     })
 
 }
 
 async function remove_frontend(name) {
     return new Promise(async resolve => {
-        const cmd = docker_command(name, 'rm')
+        const cmd = await docker_command(name, 'down')
         cmd.on('error', error => { console.error(`command error: "${error}"`); resolve(true) });
         cmd.stdout.on('data', line => console.log(line))
-        cmd.stderr.on('data', () => resolve(true))
+        cmd.stderr.on('data', () => resolve('not_downloaded'))
         await cmd.spawn();
-        resolve(false)
     })
-
 }
 
 function health() {
@@ -83,7 +81,7 @@ async function stop_all() {
 }
 
 export default {
-    install_frontend,
+    download_frontend,
     run_frontend,
     stop_frontend,
     remove_frontend,

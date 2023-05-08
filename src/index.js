@@ -11,11 +11,11 @@ let frontends_running = {};
     const platform = await window.__TAURI__.os.platform()
     const config = JSON.parse(await fs.readTextFile(await path.resolveResource('frontends.json')))
     let isDockerInstalled = await docker_frontends.health()
-    console.log(isDockerInstalled)
     if (platform == "linux") {
-        binary_frontends.run_frontend('caddy', './caddy_linux_amd64', ['run'])
-    } else if (platform == "win32") {
-        binary_frontends.run_frontend('caddy', '.\\caddy_windows_amd64.exe', ['run'])
+        await binary_frontends.run_caddy('linux')
+    }
+    else if (platform == "win32") {
+        await binary_frontends.run_caddy('windows')
     }
     docker_frontends.run_frontend('redis')
     for (const key in config) {
@@ -54,79 +54,186 @@ let frontends_running = {};
             <button id="${key}-remove">${icons.remove}<span>Remove</span></button>
             `
             document.getElementById("frontends").appendChild(tile)
-            document.getElementById(`${key}-run`).addEventListener("click", () => {
+            const downloadElement = document.getElementById(`${key}-download`)
+            const linkElement = document.getElementById(`${key}-link`)
+            const runElement = document.getElementById(`${key}-run`)
+            const closeElement = document.getElementById(`${key}-close`)
+            const removeElement = document.getElementById(`${key}-remove`)
+            runElement.addEventListener("click", async () => {
+                frontends_running[key] = 'starting'
+                running_buttons()
                 if (!config[key].docker) {
-                    binary_frontends.run_frontend(
-                        key, ({ "linux": config[key].command_linux, "win32": config[key].command_windows })[platform], config[key].args, config[key].env)
-                        .then(result => {
-                            frontends_running[key] = result;
-                            running_buttons(key)
-                        })
+                    frontends_running[key] = await binary_frontends.run_frontend(
+                        key,
+                        ({ "linux": config[key].command_linux, "win32": config[key].command_windows })[platform],
+                        config[key].args,
+                        config[key].env
+                    )
                 } else {
-                    docker_frontends.run_frontend(key)
-                        .then(result => {
-                            frontends_running[key] = result;
-                            running_buttons(key)
-                        })
+                    frontends_running[key] = await docker_frontends.run_frontend(key)
                 }
-                document.getElementById(`${key}-run`).getElementsByTagName('span')[0].innerHTML = "Be patient it's not broken..."
-                document.getElementById(`${key}-run`).style.pointerEvents = 'none'
-                document.getElementById(`${key}-run`).style.userSelect = 'none'
-                document.getElementById(`${key}-run`).style.opacity = .4
+                running_buttons()
             })
-            document.getElementById(`${key}-close`).addEventListener("click", () => {
+            closeElement.addEventListener("click", async () => {
+                frontends_running[key] = 'closing'
+                running_buttons()
                 if (!config[key].docker) {
-                    binary_frontends.stop_frontend(key).then(result => {
-                        frontends_running[key] = result;
-                        running_buttons(key)
-                    })
+                    frontends_running[key] = await binary_frontends.stop_frontend(key)
                 } else {
-                    docker_frontends.stop_frontend(key).then(result => {
-                        frontends_running[key] = result;
-                        running_buttons(key)
-                    })
+                    frontends_running[key] = await docker_frontends.stop_frontend(key)
                 }
-                document.getElementById(`${key}-close`).getElementsByTagName('span')[0].innerHTML = "Closing..."
-                document.getElementById(`${key}-close`).style.pointerEvents = 'none'
-                document.getElementById(`${key}-close`).style.userSelect = 'none'
-                document.getElementById(`${key}-close`).style.opacity = .4
+                running_buttons()
+            })
+            downloadElement.addEventListener("click", async () => {
+                frontends_running[key] = 'downloading'
+                running_buttons()
+                if (!config[key].docker) {
+                    frontends_running[key] = await binary_frontends.download_frontend(key)
+                } else {
+                    frontends_running[key] = await docker_frontends.download_frontend(key)
+                }
+                running_buttons()
+            })
+            removeElement.addEventListener("click", async () => {
+                frontends_running[key] = 'removing'
+                running_buttons()
+                if (!config[key].docker) {
+                    frontends_running[key] = await binary_frontends.remove_frontend(key)
+                } else {
+                    frontends_running[key] = await docker_frontends.remove_frontend(key)
+                }
+                running_buttons()
             })
 
-            frontends_running[key] = false
-            function running_buttons(name) {
-                const linkElement = document.getElementById(`${name}-link`)
-                const runElement = document.getElementById(`${name}-run`)
-                const closeElement = document.getElementById(`${name}-close`)
-                if (frontends_running[name] == 'error') {
-                    runElement.getElementsByTagName('span')[0].innerHTML = "Error..."
-                    runElement.style.pointerEvents = ''
-                    runElement.style.userSelect = ''
-                    runElement.style.opacity = 1
-                } else if (frontends_running[name] == true) {
-                    linkElement.style.pointerEvents = ''
-                    linkElement.style.userSelect = ''
-                    linkElement.style.opacity = 1
-                    runElement.style.display = 'none'
-                    runElement.getElementsByTagName('span')[0].innerHTML = "Run"
-                    runElement.style.pointerEvents = ''
-                    runElement.style.userSelect = ''
-                    runElement.style.opacity = 1
-                    closeElement.style.display = ''
-                } else if (frontends_running[name] == false) {
-                    linkElement.style.pointerEvents = 'none'
-                    linkElement.style.userSelect = 'none'
-                    linkElement.style.opacity = .4
-                    runElement.style.display = ''
-                    closeElement.getElementsByTagName('span')[0].innerHTML = "Close"
-                    closeElement.style.pointerEvents = ''
-                    closeElement.style.userSelect = ''
-                    closeElement.style.opacity = 1
-                    closeElement.style.display = 'none'
+            function running_buttons() {
+                console.log(key, frontends_running[key])
+                switch (frontends_running[key]) {
+                    case 'not_downloaded':
+                        downloadElement.style.display = ''
+                        downloadElement.getElementsByTagName('span')[0].innerHTML = "Download"
+                        downloadElement.style.pointerEvents = ''
+                        downloadElement.style.userSelect = ''
+                        downloadElement.style.opacity = 1
+
+                        runElement.style.display = 'none'
+
+                        linkElement.style.pointerEvents = 'none'
+                        linkElement.style.userSelect = 'none'
+                        linkElement.style.opacity = .4
+
+                        closeElement.style.display = 'none'
+
+                        removeElement.style.display = 'none'
+                        break;
+                    case 'downloading':
+                        downloadElement.getElementsByTagName('span')[0].innerHTML = "Downloading..."
+                        downloadElement.style.pointerEvents = 'none'
+                        downloadElement.style.userSelect = 'none'
+                        downloadElement.style.opacity = .4
+
+                        runElement.style.display = 'none'
+
+                        linkElement.style.pointerEvents = 'none'
+                        linkElement.style.userSelect = 'none'
+                        linkElement.style.opacity = .4
+
+                        closeElement.style.display = 'none'
+
+                        removeElement.style.display = 'none'
+                        break;
+                    case 'downloaded':
+                        downloadElement.style.display = 'none'
+
+                        runElement.style.display = ''
+                        runElement.getElementsByTagName('span')[0].innerHTML = "Run"
+                        runElement.style.pointerEvents = ''
+                        runElement.style.userSelect = ''
+                        runElement.style.opacity = 1
+
+                        linkElement.style.pointerEvents = 'none'
+                        linkElement.style.userSelect = 'none'
+                        linkElement.style.opacity = .4
+
+                        closeElement.style.display = 'none'
+
+                        removeElement.style.display = ''
+                        removeElement.getElementsByTagName('span')[0].innerHTML = "Remove"
+                        removeElement.style.pointerEvents = ''
+                        removeElement.style.userSelect = ''
+                        removeElement.style.opacity = 1
+                        break;
+                    case 'starting':
+                        downloadElement.style.display = 'none'
+
+                        runElement.getElementsByTagName('span')[0].innerHTML = "Starting..."
+                        runElement.style.pointerEvents = 'none'
+                        runElement.style.userSelect = 'none'
+                        runElement.style.opacity = .4
+
+                        linkElement.style.pointerEvents = 'none'
+                        linkElement.style.userSelect = 'none'
+                        linkElement.style.opacity = .4
+
+                        closeElement.style.display = 'none'
+
+                        removeElement.style.display = 'none'
+                        break;
+                    case 'running':
+                        downloadElement.style.display = 'none'
+
+                        runElement.style.display = 'none'
+
+                        linkElement.style.pointerEvents = ''
+                        linkElement.style.userSelect = ''
+                        linkElement.style.opacity = 1
+
+                        closeElement.style.display = ''
+                        closeElement.getElementsByTagName('span')[0].innerHTML = "Close"
+                        closeElement.style.pointerEvents = ''
+                        closeElement.style.userSelect = ''
+                        closeElement.style.opacity = 1
+
+                        removeElement.style.display = 'none'
+                        break;
+                    case 'closing':
+                        downloadElement.style.display = 'none'
+
+                        runElement.style.display = 'none'
+
+                        linkElement.style.pointerEvents = 'none'
+                        linkElement.style.userSelect = 'none'
+                        linkElement.style.opacity = .4
+
+                        closeElement.getElementsByTagName('span')[0].innerHTML = "Closing..."
+                        closeElement.style.pointerEvents = 'none'
+                        closeElement.style.userSelect = 'none'
+                        closeElement.style.opacity = .4
+
+                        removeElement.style.display = 'none'
+                        break;
+                    case 'removing':
+                        downloadElement.style.display = 'none'
+
+                        runElement.style.display = 'none'
+
+                        linkElement.style.pointerEvents = 'none'
+                        linkElement.style.userSelect = 'none'
+                        linkElement.style.opacity = .4
+
+                        closeElement.style.display = 'none'
+
+                        removeElement.style.display = ''
+                        removeElement.getElementsByTagName('span')[0].innerHTML = "Removing..."
+                        removeElement.style.pointerEvents = 'none'
+                        removeElement.style.userSelect = 'none'
+                        removeElement.style.opacity = .4
+                        break;
+                    default:
+                        break;
                 }
-                document.getElementById(`${name}-download`).style.display = 'none'
-                document.getElementById(`${name}-remove`).style.display = 'none'
             }
-            running_buttons(key)
+            frontends_running[key] = await binary_frontends.check_downloaded(key)
+            running_buttons()
         }
     }
 })()

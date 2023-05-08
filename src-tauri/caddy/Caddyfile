@@ -1,0 +1,42 @@
+http://localhost:8080 {
+	reverse_proxy localhost:10040
+}
+http://libreddit.localhost:8080 {
+	reverse_proxy localhost:10041
+}
+http://rimgo.localhost:8080 {
+	reverse_proxy localhost:10042
+}
+http://nitter.localhost:8080 {
+	reverse_proxy localhost:10043
+}
+http://simplytranslate.localhost:8080 {
+	reverse_proxy localhost:10044
+}
+http://breezewiki.localhost:8080 {
+	reverse_proxy localhost:10045
+}
+http://anonymousoverflow.localhost:8080 {
+	reverse_proxy localhost:10046
+}
+http://dumb.localhost:8080 {
+	reverse_proxy localhost:10047
+}
+http://biblioreads.localhost:8080 {
+	reverse_proxy localhost:10048
+}
+http://proxitok.localhost:8080 {
+	reverse_proxy localhost:10049
+}
+http://quetre.localhost:8080 {
+	reverse_proxy localhost:10050
+}
+http://libremdb.localhost:8080 {
+	reverse_proxy localhost:10051
+}
+http://searxng.localhost:8080 {
+	reverse_proxy localhost:10052
+}
+http://teddit.localhost:8080 {
+	reverse_proxy localhost:10053
+}
