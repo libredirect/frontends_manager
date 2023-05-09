@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "libredirect_frontends_manager",
-    "version": "0.0.4"
+    "version": "0.0.5"
   },
   "tauri": {
     "allowlist": {
@@ -18,6 +18,11 @@
         "scope": [
           "https://github.com/libredirect/frontends_binaries/raw/main/*"
         ]
+      },
+      "process": {
+        "all": false,
+        "exit": true,
+        "relaunch": true
       },
       "fs": {
         "all": true,
@@ -75,11 +80,6 @@
           {
             "name": "docker",
             "cmd": "docker",
-            "args": true
-          },
-          {
-            "name": "chmod",
-            "cmd": "chmod",
             "args": true
           },
           {

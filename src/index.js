@@ -5,30 +5,19 @@ import icons from './services/icons.js'
 const Twindow = window.__TAURI__.window
 const path = window.__TAURI__.path;
 const fs = window.__TAURI__.fs;
+const process = window.__TAURI__.process;
 
 let frontends_running = {};
 (async () => {
     const platform = await window.__TAURI__.os.platform()
     const config = JSON.parse(await fs.readTextFile(await path.resolveResource('frontends.json')))
     let isDockerInstalled = await docker_frontends.health()
-    if (platform == "linux") {
-        await binary_frontends.run_caddy('linux')
-    }
-    else if (platform == "win32") {
-        await binary_frontends.run_caddy('windows')
-    }
-    if (isDockerInstalled == 'running'){
+    await binary_frontends.run_caddy()
+    if (isDockerInstalled == 'running') {
         await docker_frontends.download_frontend('redis')
         await docker_frontends.run_frontend('redis')
     }
     for (const key in config) {
-        if (
-            !(platform == "linux" && config[key].command_linux)
-            &&
-            !(platform == "win32" && config[key].command_windows)
-            &&
-            !config[key].docker
-        ) continue
         const tile = document.createElement('div')
         tile.classList.add('tile')
         tile.innerHTML = `
@@ -81,9 +70,9 @@ let frontends_running = {};
                 frontends_running[key] = 'closing'
                 running_buttons()
                 if (!config[key].docker) {
-                    frontends_running[key] = await binary_frontends.stop_frontend(key)
+                    frontends_running[key] = await binary_frontends.stop_frontend(key, true)
                 } else {
-                    frontends_running[key] = await docker_frontends.stop_frontend(key)
+                    frontends_running[key] = await docker_frontends.stop_frontend(key, true)
                 }
                 running_buttons()
             })
@@ -109,7 +98,6 @@ let frontends_running = {};
             })
 
             function running_buttons() {
-                console.log(key, frontends_running[key])
                 switch (frontends_running[key]) {
                     case 'not_downloaded':
                         downloadElement.style.display = ''
@@ -235,8 +223,20 @@ let frontends_running = {};
                         break;
                 }
             }
-            frontends_running[key] = await binary_frontends.check_downloaded(key)
+            if (!config[key].docker) frontends_running[key] = await binary_frontends.check_downloaded(key)
+            else frontends_running[key] = await docker_frontends.check_downloaded(key)
+
             running_buttons()
         }
     }
 })()
+
+Twindow.appWindow.onMenuClicked(async ({ payload: menuId }) => {
+    if (menuId == 'quite') {
+        await binary_frontends.stop_all()
+        await docker_frontends.stop_all()
+        setTimeout(async () => {
+            await process.exit(0)
+        }, 5000);
+    }
+});

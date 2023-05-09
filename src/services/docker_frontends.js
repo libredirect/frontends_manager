@@ -1,6 +1,6 @@
 const shell = window.__TAURI__.shell;
 const path = window.__TAURI__.path;
-const fs = window.__TAURI__.fs;
+const tauri = window.__TAURI__.tauri
 
 let frontendsProcessesDocker = []
 
@@ -20,11 +20,30 @@ async function download_frontend(name) {
     })
 }
 
+async function check_downloaded(name) {
+    return new Promise(async resolve => {
+        resolve('not_downloaded')
+        // const cmd = new shell.Command('docker', ['ps', '-q', '-f', `name="${name}"`], { cwd: await path.resolveResource('docker_frontends') })
+        // cmd.stdout.on('data', data => {
+        //     console.log('docker data', data);
+        //     resolve('running');
+        // })
+        // cmd.on('close', data => {
+        //     console.log(name, `code ${data.code} and signal ${data.signal}`)
+        //     resolve('downloaded')
+        // });
+        // cmd.on('error', error => console.error(`command error: "${error}"`));
+        // cmd.stdout.on('data', line => console.log(`command stdout: "${line}"`));
+        // cmd.stderr.on('data', line => console.log(`command stderr: "${line}"`));
+        // await cmd.spawn()
+    })
+}
+
 async function run_frontend(name) {
     return new Promise(async resolve => {
         const cmd = await docker_command(name, 'start')
         cmd.on('error', error => { console.error(`command error: "${error}"`); resolve(false) });
-        cmd.on('close', data => {
+        cmd.on('close', async data => {
             console.log(`command finished with code ${data.code} and signal ${data.signal}`)
             frontendsProcessesDocker.push(name)
             resolve('running')
@@ -33,17 +52,16 @@ async function run_frontend(name) {
     })
 
 }
-async function stop_frontend(name) {
+function stop_frontend(name, slice) {
     return new Promise(async resolve => {
         const cmd = await docker_command(name, 'stop')
         cmd.on('error', error => { console.error(`command error: "${error}"`); resolve(true) });
         cmd.on('close', data => {
             console.log(`command finished with code ${data.code} and signal ${data.signal}`)
-            frontendsProcessesDocker.splice(frontendsProcessesDocker.indexOf(name), 1)
+            if (slice) frontendsProcessesDocker.splice(frontendsProcessesDocker.indexOf(name), 1)
             resolve('downloaded')
         });
         await cmd.spawn()
-
     })
 
 }
@@ -75,8 +93,9 @@ function health() {
 }
 
 async function stop_all() {
+    console.log(frontendsProcessesDocker)
     for (const name of frontendsProcessesDocker) {
-        await stop_frontend(name)
+        await stop_frontend(name, false)
     }
 }
 
@@ -85,6 +104,7 @@ export default {
     run_frontend,
     stop_frontend,
     remove_frontend,
+    check_downloaded,
     health,
     stop_all
 }

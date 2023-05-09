@@ -1,8 +1,11 @@
 const shell = window.__TAURI__.shell;
 const path = window.__TAURI__.path;
 const fs = window.__TAURI__.fs;
-const Twindow = window.__TAURI__.window
 const http = window.__TAURI__.http
+
+Object.values = function (obj) {
+    return Object.keys(obj).map(key => obj[key])
+}
 
 let platform;
 (async () => {
@@ -20,9 +23,9 @@ function formatEnv(env) {
     return obj
 }
 
-async function run_caddy(platform) {
+async function run_caddy() {
     let command
-    if (platform == 'windows ') {
+    if (platform == 'win32 ') {
         command = '.\\caddy_windows_amd64.exe'
     } else if (platform == 'linux') {
         command = './caddy_linux_amd64'
@@ -38,6 +41,7 @@ async function run_caddy(platform) {
     return true
 }
 
+
 async function run_frontend(name, command, args, env) {
     const cmd = new shell.Command(command, args, { cwd: await path.join(await path.appDataDir(), name), env: formatEnv(env) })
     cmd.on('error', error => {
@@ -49,24 +53,31 @@ async function run_frontend(name, command, args, env) {
     return 'running'
 }
 
-async function download_frontend(name) {
-    let filename
-    if (platform == 'linux') {
-        filename = `${name}_linux_x86_64.tar.gz`
-    } else if (platform == 'windows') {
-        filename = `${name}_windows_x86_64.zip`
-    }
-    const response = await http.fetch(
-        `https://github.com/libredirect/frontends_binaries/raw/main/binaries/${filename}`,
-        { method: 'GET', responseType: http.ResponseType.Binary }
-    );
-    await fs.writeBinaryFile(filename, new Uint8Array(response.data), { dir: fs.BaseDirectory.AppData });
-    if (platform == 'linux') {
-        const extract_cmd = new shell.Command('tar', ['-xzf', filename], { cwd: await path.appDataDir() })
+function download_frontend(name) {
+    return new Promise(async resolve => {
+        let filename
+        if (platform == 'linux') {
+            filename = `${name}_linux_x86_64.tar.gz`
+        } else if (platform == 'win32') {
+            filename = `${name}_windows_x86_64.zip`
+        }
+        const response = await http.fetch(
+            `https://github.com/libredirect/frontends_binaries/raw/main/binaries/${filename}`,
+            { method: 'GET', responseType: http.ResponseType.Binary }
+        );
+        await fs.writeBinaryFile(filename, new Uint8Array(response.data), { dir: fs.BaseDirectory.AppData });
+        let extract_cmd
+        if (platform == 'linux') {
+            extract_cmd = new shell.Command('tar', ['-xzf', filename], { cwd: await path.appDataDir() })
+        } else if (platform == 'win32') {
+            extract_cmd = new shell.Command('tar', ['-acf', filename], { cwd: await path.appDataDir() })
+        }
+        extract_cmd.on('close', async () => {
+            await fs.removeFile(filename, { dir: fs.BaseDirectory.AppData })
+            resolve('downloaded')
+        });
         await extract_cmd.spawn();
-        extract_cmd.on('close', async () => await fs.removeFile(filename, { dir: fs.BaseDirectory.AppData }));
-    }
-    return 'downloaded'
+    })
 }
 
 async function check_downloaded(name) {
@@ -81,15 +92,16 @@ async function remove_frontend(name) {
     return 'not_downloaded'
 }
 
-async function stop_frontend(name) {
+async function stop_frontend(name, slice) {
     const result = await frontendsProcesses[name].kill();
+    if (slice) delete [name]
     if (result == null) return 'downloaded'
     else return 'running'
 }
 
 async function stop_all() {
     for (const name of Object.keys(frontendsProcesses)) {
-        await frontendsProcesses[name].kill();
+        await stop_frontend(name, false)
     }
 }
 
