@@ -6,6 +6,7 @@ const Twindow = window.__TAURI__.window
 const path = window.__TAURI__.path;
 const fs = window.__TAURI__.fs;
 const process = window.__TAURI__.process;
+const event = window.__TAURI__.event
 
 let frontends_running = {};
 (async () => {
@@ -231,12 +232,20 @@ let frontends_running = {};
     }
 })()
 
+async function quitApp() {
+    await binary_frontends.stop_all()
+    await docker_frontends.stop_all()
+    await process.exit(0)
+}
+
 Twindow.appWindow.onMenuClicked(async ({ payload: menuId }) => {
-    if (menuId == 'quite') {
-        await binary_frontends.stop_all()
-        await docker_frontends.stop_all()
-        setTimeout(async () => {
-            await process.exit(0)
-        }, 5000);
+    if (menuId == 'quit') {
+        await quitApp()
     }
 });
+
+event.listen("tray", async (event) => {
+    if (event.payload == "quit") {
+        await quitApp()
+    }
+})

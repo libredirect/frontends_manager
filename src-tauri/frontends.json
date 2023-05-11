@@ -95,5 +95,10 @@
         "name": "Teddit",
         "icon": "teddit.png",
         "docker": true
+    },
+    "lingva": {
+        "name": "LingvaTranslate",
+        "icon": "lingva.png",
+        "docker": true
     }
 }

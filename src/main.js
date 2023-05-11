@@ -3,9 +3,9 @@ const path = require('path');
 const docker = require('./services/docker_frontends')
 const executable = require('./services/binary_frontends')
 
-let readyToQuite = false
+let readyToquit = false
 app.on("before-quit", async event => {
-    if (readyToQuite) return
+    if (readyToquit) return
     event.preventDefault();
     const closeWin = new BrowserWindow({
         icon: path.join(__dirname, 'assets', 'imgs', 'icon.png'),
@@ -17,7 +17,7 @@ app.on("before-quit", async event => {
     closeWin.resizable = false
     executable.stop_all()
     docker.stop_all()
-    readyToQuite = true
+    readyToquit = true
     closeWin.close()
     app.quit()
 })
