@@ -1,23 +1,18 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use tauri::{CustomMenuItem, Manager, Menu, Submenu, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem};
+use tauri::{
+    CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
+};
 
 fn main() {
     let tray_menu = SystemTrayMenu::new()
         .add_item(CustomMenuItem::new("show", "Show"))
         .add_item(CustomMenuItem::new("hide", "Hide"))
         .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(CustomMenuItem::new("quit", "quit"));
-
-    let submenu = Submenu::new(
-        "File",
-        Menu::new().add_item(CustomMenuItem::new("quit", "Quit")),
-    );
-    let menu = Menu::new().add_submenu(submenu);
+        .add_item(CustomMenuItem::new("quit", "Quit"));
 
     tauri::Builder::default()
-        .menu(menu)
         .system_tray(SystemTray::new().with_menu(tray_menu))
         .on_system_tray_event(|app, event| match event {
             SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {

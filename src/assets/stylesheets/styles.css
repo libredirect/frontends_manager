@@ -26,6 +26,15 @@ body {
 	color: var(--text);
 }
 
+.navbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin: auto;
+	margin: 0 40px;
+	padding: 10px;
+}
+
 #logo {
 	display: flex;
 	justify-content: center;
@@ -91,7 +100,7 @@ div.body {
 	color: var(--active);
 }
 
-.tile button {
+button {
 	background-color: var(--bg-secondary);
 	border: none;
 	color: var(--text);
@@ -104,19 +113,19 @@ div.body {
 	cursor: pointer;
 }
 
-.tile button:hover {
+button:hover {
 	color: var(--active);
 }
 
-.tile button:active {
+button:active {
 	transform: translateY(1px);
 }
 
-.tile button:hover svg {
+button:hover svg {
 	color: var(--active);
 }
 
-.tile svg {
+svg {
 	color: var(--text);
 	padding: 0;
 	margin-right: 5px;

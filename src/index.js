@@ -8,6 +8,9 @@ const fs = window.__TAURI__.fs;
 const process = window.__TAURI__.process;
 const event = window.__TAURI__.event
 
+document.getElementById("refresh").addEventListener("click", () => window.location.reload())
+document.getElementById("quit").addEventListener("click", quitApp)
+
 let frontends_running = {};
 (async () => {
     const platform = await window.__TAURI__.os.platform()
