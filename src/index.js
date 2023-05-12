@@ -236,8 +236,10 @@ let frontends_running = {};
 })()
 
 async function quitApp() {
+    const webview = new Twindow.WebviewWindow('quitWindow', { url: 'quit.html', height: 200, width: 400, center: true });
     await binary_frontends.stop_all()
     await docker_frontends.stop_all()
+    await webview.close()
     await process.exit(0)
 }
 

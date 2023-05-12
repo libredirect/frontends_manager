@@ -27,6 +27,7 @@ async function check_downloaded(name) {
         )
         cmd.on('close', () => resolve('not_downloaded'));
         cmd.stdout.on('data', data => {
+            frontendsProcessesDocker.push(name)
             const state = JSON.parse(data).State
             if (state == "running") {
                 resolve('running')
@@ -42,7 +43,7 @@ async function run_frontend(name) {
     return new Promise(async resolve => {
         const cmd = await docker_command(name, 'start')
         cmd.on('error', error => { console.error(`command error: "${error}"`); resolve(false) });
-        cmd.on('close', async data => {
+        cmd.on('close', async () => {
             frontendsProcessesDocker.push(name)
             resolve('running')
         });
@@ -54,7 +55,7 @@ function stop_frontend(name, slice) {
     return new Promise(async resolve => {
         const cmd = await docker_command(name, 'stop')
         cmd.on('error', error => { console.error(`command error: "${error}"`); resolve(true) });
-        cmd.on('close', data => {
+        cmd.on('close', () => {
             if (slice) frontendsProcessesDocker.splice(frontendsProcessesDocker.indexOf(name), 1)
             resolve('downloaded')
         });

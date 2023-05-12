@@ -7,7 +7,7 @@ For anonymizing your IP, use [Lokinet](https://lokinet.org/)
 
 Available Frontends:
 - [LibReddit](https://github.com/spikecodes/libreddit) (linux, windows)
-- [Nitter](https://github.com/zedeus/nitter) (linux)
+- [Nitter](https://github.com/zedeus/nitter) (linux, windows)
 - [Rimgo](https://codeberg.org/video-prize-ranch/rimgo) (linux, windows)
 - [SimplyTranslate](https://git.sr.ht/~metalune/simplytranslate_web) (linux)
 - [LingvaTranslate](https://github.com/TheDavidDelta/lingva-translate) (docker)
