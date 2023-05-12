@@ -13,7 +13,6 @@ async function download_frontend(name) {
         const cmd = await docker_command(name, 'create')
         cmd.on('error', error => { console.error(`command error: "${error}"`); resolve(false) });
         cmd.on('close', data => {
-            console.log(`command finished with code ${data.code} and signal ${data.signal}`)
             resolve('downloaded')
         });
         await cmd.spawn()
@@ -22,20 +21,20 @@ async function download_frontend(name) {
 
 async function check_downloaded(name) {
     return new Promise(async resolve => {
-        resolve('not_downloaded')
-        // const cmd = new shell.Command('docker', ['ps', '-q', '-f', `name="${name}"`], { cwd: await path.resolveResource('docker_frontends') })
-        // cmd.stdout.on('data', data => {
-        //     console.log('docker data', data);
-        //     resolve('running');
-        // })
-        // cmd.on('close', data => {
-        //     console.log(name, `code ${data.code} and signal ${data.signal}`)
-        //     resolve('downloaded')
-        // });
-        // cmd.on('error', error => console.error(`command error: "${error}"`));
-        // cmd.stdout.on('data', line => console.log(`command stdout: "${line}"`));
-        // cmd.stderr.on('data', line => console.log(`command stderr: "${line}"`));
-        // await cmd.spawn()
+        const cmd = new shell.Command(
+            'docker', ['ps', '-q', '-a', '--format', 'json', '--filter', `name=${name}`],
+            { cwd: await path.resolveResource('docker_frontends') }
+        )
+        cmd.on('close', () => resolve('not_downloaded'));
+        cmd.stdout.on('data', data => {
+            const state = JSON.parse(data).State
+            if (state == "running") {
+                resolve('running')
+            } else {
+                resolve('downloaded')
+            }
+        })
+        await cmd.spawn()
     })
 }
 
@@ -44,7 +43,6 @@ async function run_frontend(name) {
         const cmd = await docker_command(name, 'start')
         cmd.on('error', error => { console.error(`command error: "${error}"`); resolve(false) });
         cmd.on('close', async data => {
-            console.log(`command finished with code ${data.code} and signal ${data.signal}`)
             frontendsProcessesDocker.push(name)
             resolve('running')
         });
@@ -57,7 +55,6 @@ function stop_frontend(name, slice) {
         const cmd = await docker_command(name, 'stop')
         cmd.on('error', error => { console.error(`command error: "${error}"`); resolve(true) });
         cmd.on('close', data => {
-            console.log(`command finished with code ${data.code} and signal ${data.signal}`)
             if (slice) frontendsProcessesDocker.splice(frontendsProcessesDocker.indexOf(name), 1)
             resolve('downloaded')
         });
@@ -70,7 +67,7 @@ async function remove_frontend(name) {
     return new Promise(async resolve => {
         const cmd = await docker_command(name, 'down')
         cmd.on('error', error => { console.error(`command error: "${error}"`); resolve(true) });
-        cmd.stdout.on('data', line => console.log(line))
+        // cmd.stdout.on('data', line => console.log(line))
         cmd.stderr.on('data', () => resolve('not_downloaded'))
         await cmd.spawn();
     })
