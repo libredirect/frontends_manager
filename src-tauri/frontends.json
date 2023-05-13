@@ -3,7 +3,7 @@
         "name": "LibReddit",
         "icon": "libreddit-icon.png",
         "command_linux": "./libreddit_linux_x86_64",
-        "command_windows": ".\\libreddit_x86_64-pc-windows-gnu.exe",
+        "command_windows": "$APPLOCALDATA\\libreddit\\libreddit_windows_x86_64.exe",
         "args": [
             "-p",
             "10041"
@@ -16,7 +16,7 @@
         "name": "Rimgo",
         "icon": "rimgo-icon.png",
         "command_linux": "./rimgo_linux_x86_64",
-        "command_windows": ".\\rimgo_windows_x86_64.exe",
+        "command_windows": "$APPLOCALDATA\\rimgo\\rimgo_windows_x86_64.exe",
         "args": [],
         "env": [
             "ADDRESS=127.0.0.1",
@@ -35,7 +35,7 @@
         "name": "AnonymousOverflow",
         "icon": "anonymousoverflow-icon.png",
         "command_linux": "./anonymousoverflow_linux_x86_64",
-        "command_windows": ".\\anonymousoverflow_windows_x86_64.exe",
+        "command_windows": "$APPLOCALDATA\\anonymousoverflow\\anonymousoverflow_windows_x86_64.exe",
         "args": [],
         "env": [
             "APP_URL=http://anonymousoverflow.localhost:8080",
@@ -54,13 +54,14 @@
         "name": "Nitter",
         "icon": "nitter-icon.png",
         "command_linux": "./nitter_linux_x86_64",
+        "command_windows": "$APPLOCALDATA\\nitter\\nitter_windows_x86_64.exe",
         "args": []
     },
     "dumb": {
         "name": "Dumb",
         "icon": "dumb.png",
         "command_linux": "./dumb_linux_x86_64",
-        "command_windows": ".\\dumb_windows_x86_64.exe",
+        "command_windows": "$APPLOCALDATA\\dumb\\dumb_windows_x86_64.exe",
         "args": [],
         "env": [
             "PORT=10047"

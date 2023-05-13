@@ -8,7 +8,7 @@ const fs = window.__TAURI__.fs;
 const process = window.__TAURI__.process;
 const event = window.__TAURI__.event
 
-document.getElementById("refresh").addEventListener("click", () => window.location.reload())
+document.getElementById("refresh").addEventListener("click", async () => await refreshApp())
 document.getElementById("quit").addEventListener("click", quitApp)
 
 let frontends_running = {};
@@ -22,6 +22,7 @@ let frontends_running = {};
         await docker_frontends.run_frontend('redis')
     }
     for (const key in config) {
+        if (!config[key].docker && ((platform == 'linux' && !config[key].command_linux) || (platform == 'win32' && !config[key].command_windows))) continue
         const tile = document.createElement('div')
         tile.classList.add('tile')
         tile.innerHTML = `
@@ -243,14 +244,18 @@ async function quitApp() {
     await process.exit(0)
 }
 
+async function refreshApp() {
+    const webview = new Twindow.WebviewWindow('refreshWindow', { url: 'refresh.html', height: 200, width: 400, center: true });
+    await binary_frontends.stop_all()
+    await docker_frontends.stop_all()
+    await webview.close()
+    window.location.reload()
+}
+
 Twindow.appWindow.onMenuClicked(async ({ payload: menuId }) => {
-    if (menuId == 'quit') {
-        await quitApp()
-    }
+    if (menuId == 'quit') await quitApp()
 });
 
 event.listen("tray", async (event) => {
-    if (event.payload == "quit") {
-        await quitApp()
-    }
+    if (event.payload == "quit") await quitApp()
 })

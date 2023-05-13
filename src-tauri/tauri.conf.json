@@ -28,7 +28,7 @@
         "all": true,
         "scope": [
           "$RESOURCE/*",
-          "$APPDATA/*"
+          "$APPLOCALDATA/*"
         ]
       },
       "os": {
@@ -40,11 +40,6 @@
           {
             "name": "./caddy_linux_amd64",
             "cmd": "./caddy_linux_amd64",
-            "args": true
-          },
-          {
-            "name": "./redis-stable/src/redis-server",
-            "cmd": "./redis-stable/src/redis-server",
             "args": true
           },
           {
@@ -75,6 +70,41 @@
           {
             "name": "./dumb_linux_x86_64",
             "cmd": "./dumb_linux_x86_64",
+            "args": true
+          },
+          {
+            "name": "$RESOURCE\\caddy\\caddy_windows_amd64.exe",
+            "cmd": "$RESOURCE\\caddy\\caddy_windows_amd64.exe",
+            "args": true
+          },
+          {
+            "name": "$APPLOCALDATA\\libreddit\\libreddit_windows_x86_64.exe",
+            "cmd": "$APPLOCALDATA\\libreddit\\libreddit_windows_x86_64.exe",
+            "args": true
+          },
+          {
+            "name": "$APPLOCALDATA\\rimgo\\rimgo_windows_x86_64.exe",
+            "cmd": "$APPLOCALDATA\\rimgo\\rimgo_windows_x86_64.exe",
+            "args": true
+          },
+          {
+            "name": "$APPLOCALDATA\\anonymousoverflow\\anonymousoverflow_windows_x86_64.exe",
+            "cmd": "$APPLOCALDATA\\anonymousoverflow\\anonymousoverflow_windows_x86_64.exe",
+            "args": true
+          },
+          {
+            "name": "$APPLOCALDATA\\simplytranslate\\simplytranslate_windows_x86_64.exe",
+            "cmd": "$APPLOCALDATA\\simplytranslate\\simplytranslate_windows_x86_64.exe",
+            "args": true
+          },
+          {
+            "name": "$APPLOCALDATA\\nitter\\nitter_windows_x86_64.exe",
+            "cmd": "$APPLOCALDATA\\nitter\\nitter_windows_x86_64.exe",
+            "args": true
+          },
+          {
+            "name": "$APPLOCALDATA\\dumb\\dumb_windows_x86_64.exe",
+            "cmd": "$APPLOCALDATA\\dumb\\dumb_windows_x86_64.exe",
             "args": true
           },
           {
@@ -109,8 +139,8 @@
       "targets": "all",
       "resources": [
         "frontends.json",
-        "docker_frontends/*",
-        "caddy/*"
+        "docker_frontends",
+        "caddy"
       ]
     },
     "updater": {

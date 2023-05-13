@@ -25,17 +25,12 @@ function formatEnv(env) {
 
 async function run_caddy() {
     let command
-    if (platform == 'win32 ') {
-        command = '.\\caddy_windows_amd64.exe'
+    if (platform == 'win32') {
+        command = "$RESOURCE\\caddy\\caddy_windows_amd64.exe"
     } else if (platform == 'linux') {
         command = './caddy_linux_amd64'
     }
     const cmd = new shell.Command(command, ['run'], { cwd: await path.resolveResource('caddy') })
-    cmd.on('error', error => {
-        console.error(`command error: "${error}"`)
-        return false
-    });
-
     const child = await cmd.spawn();
     frontendsProcesses['caddy'] = child
     return true
@@ -43,7 +38,7 @@ async function run_caddy() {
 
 
 async function run_frontend(name, command, args, env) {
-    const cmd = new shell.Command(command, args, { cwd: await path.join(await path.appDataDir(), name), env: formatEnv(env) })
+    const cmd = new shell.Command(command, args, { cwd: await path.join(await path.appLocalDataDir(), name), env: formatEnv(env) })
     cmd.on('error', error => {
         console.error(`command error: "${error}"`)
         return 'downloaded'
@@ -65,15 +60,15 @@ function download_frontend(name) {
             `https://github.com/libredirect/frontends_binaries/raw/main/binaries/${filename}`,
             { method: 'GET', responseType: http.ResponseType.Binary }
         );
-        await fs.writeBinaryFile(filename, new Uint8Array(response.data), { dir: fs.BaseDirectory.AppData });
+        await fs.writeBinaryFile(filename, new Uint8Array(response.data), { dir: fs.BaseDirectory.AppLocalData });
         let extract_cmd
         if (platform == 'linux') {
-            extract_cmd = new shell.Command('tar', ['-xzf', filename], { cwd: await path.appDataDir() })
+            extract_cmd = new shell.Command('tar', ['-xzf', filename], { cwd: await path.appLocalDataDir() })
         } else if (platform == 'win32') {
-            extract_cmd = new shell.Command('tar', ['-acf', filename], { cwd: await path.appDataDir() })
+            extract_cmd = new shell.Command('tar', ['-xf', filename], { cwd: await path.appLocalDataDir() })
         }
         extract_cmd.on('close', async () => {
-            await fs.removeFile(filename, { dir: fs.BaseDirectory.AppData })
+            await fs.removeFile(filename, { dir: fs.BaseDirectory.AppLocalData })
             resolve('downloaded')
         });
         await extract_cmd.spawn();
@@ -81,14 +76,14 @@ function download_frontend(name) {
 }
 
 async function check_downloaded(name) {
-    if (await fs.exists(`${name}`, { dir: fs.BaseDirectory.AppData })) {
+    if (await fs.exists(`${name}`, { dir: fs.BaseDirectory.AppLocalData })) {
         return 'downloaded'
     } else {
         return 'not_downloaded'
     }
 }
 async function remove_frontend(name) {
-    await fs.removeDir(name, { dir: fs.BaseDirectory.AppData, recursive: true })
+    await fs.removeDir(name, { dir: fs.BaseDirectory.AppLocalData, recursive: true })
     return 'not_downloaded'
 }
 

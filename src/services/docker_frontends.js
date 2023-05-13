@@ -77,6 +77,7 @@ async function remove_frontend(name) {
 function health() {
     return new Promise(async resolve => {
         const cmd = new shell.Command('docker', ['compose', 'version'])
+        console.log(cmd)
         cmd.on('error', () => resolve('not_installed'));
         cmd.stderr.on('data', () => resolve('not_installed'))
         cmd.stdout.on('data', async () => {
