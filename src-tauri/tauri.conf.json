@@ -7,8 +7,8 @@
     "withGlobalTauri": true
   },
   "package": {
-    "productName": "libredirect_frontends_manager",
-    "version": "0.0.5"
+    "productName": "Libredirect Frontends Manager",
+    "version": "0.0.6"
   },
   "tauri": {
     "allowlist": {
