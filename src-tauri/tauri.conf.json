@@ -78,8 +78,8 @@
             "args": true
           },
           {
-            "name": "$RESOURCE\\caddy\\caddy_windows_amd64.exe",
-            "cmd": "$RESOURCE\\caddy\\caddy_windows_amd64.exe",
+            "name": "$APPLOCALDATA\\caddy\\caddy_windows_amd64.exe",
+            "cmd": "$APPLOCALDATA\\caddy\\caddy_windows_amd64.exe",
             "args": true
           },
           {

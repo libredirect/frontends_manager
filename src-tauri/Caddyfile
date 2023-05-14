@@ -1,5 +1,5 @@
 http://localhost:8080 {
-	reverse_proxy localhost:10040
+	respond "Hello strange Arsen!"
 }
 http://libreddit.localhost:8080 {
 	reverse_proxy localhost:10041

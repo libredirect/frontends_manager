@@ -41,15 +41,26 @@ async function run_caddy() {
         filename = await path.join('caddy', filename)
         const response = await http.fetch(url, { method: 'GET', responseType: http.ResponseType.Binary });
         await fs.createDir('caddy', { dir: fs.BaseDirectory.AppLocalData, recursive: true });
-        await fs.copyFile('Caddyfile', await path.join(await path.appLocalDataDir(), 'caddy', 'Caddyfile'));
         await fs.writeBinaryFile(filename, new Uint8Array(response.data), { dir: fs.BaseDirectory.AppLocalData });
         if (platform == 'linux') {
             await new shell.Command('chmod', ['u+x', filename], { cwd: await path.join(await path.appLocalDataDir()) }).execute();
         }
     }
-    await run_frontend('caddy')
+    let command
+    if (platform == 'win32') {
+        command = config['caddy'].command_windows
+    } else if (platform == 'linux') {
+        command = config['caddy'].command_linux
+    }
+    const cmd = new shell.Command(command, ['run'], { cwd: await path.resolveResource('') })
+    cmd.on('error', error => {
+        console.error(`command error: "${error}"`)
+        return 'downloaded'
+    });
+    const child = await cmd.spawn();
+    frontendsProcesses['caddy'] = child
+    return 'running'
 }
-
 
 async function run_frontend(name) {
     let command
@@ -59,6 +70,7 @@ async function run_frontend(name) {
         command = config[name].command_linux
     }
     const cmd = new shell.Command(command, config[name].args, { cwd: await path.join(await path.appLocalDataDir(), name), env: formatEnv(config[name].env) })
+    console.log(cmd)
     cmd.on('error', error => {
         console.error(`command error: "${error}"`)
         return 'downloaded'
