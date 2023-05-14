@@ -1,12 +1,4 @@
 {
-    "caddy": {
-        "name": "Caddy",
-        "command_linux": "./caddy_linux_amd64",
-        "command_windows": "$APPLOCALDATA\\caddy\\caddy_windows_amd64.exe",
-        "args": [
-            "run"
-        ]
-    },
     "libreddit": {
         "name": "LibReddit",
         "icon": "libreddit-icon.png",

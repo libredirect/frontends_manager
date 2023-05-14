@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "Libredirect Frontends Manager",
-    "version": "0.0.7"
+    "version": "0.0.8"
   },
   "tauri": {
     "allowlist": {
@@ -43,8 +43,8 @@
         "all": true,
         "scope": [
           {
-            "name": "./caddy_linux_amd64",
-            "cmd": "./caddy_linux_amd64",
+            "name": "$APPLOCALDATA/caddy/caddy_linux_amd64",
+            "cmd": "$APPLOCALDATA/caddy/caddy_linux_amd64",
             "args": true
           },
           {

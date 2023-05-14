@@ -48,9 +48,9 @@ async function run_caddy() {
     }
     let command
     if (platform == 'win32') {
-        command = config['caddy'].command_windows
+        command = '$APPLOCALDATA\\caddy\\caddy_windows_amd64.exe'
     } else if (platform == 'linux') {
-        command = config['caddy'].command_linux
+        command = '$APPLOCALDATA/caddy/caddy_linux_amd64'
     }
     const cmd = new shell.Command(command, ['run'], { cwd: await path.resolveResource('') })
     cmd.on('error', error => {
