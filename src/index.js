@@ -17,7 +17,9 @@ let frontends_running = {};
     const platform = await window.__TAURI__.os.platform()
     const config = JSON.parse(await fs.readTextFile(await path.resolveResource('frontends.json')))
     let isDockerInstalled = await docker_frontends.health()
+    const caddy_donloading = new Twindow.WebviewWindow('refreshWindow', { url: 'message.html#Downloading Caddy', height: 200, width: 400, center: true });
     await binary_frontends.run_caddy()
+    caddy_donloading.close()
     if (isDockerInstalled == 'running') {
         await docker_frontends.download_frontend('redis')
         await docker_frontends.run_frontend('redis')
@@ -234,7 +236,7 @@ let frontends_running = {};
 })()
 
 async function quitApp() {
-    const webview = new Twindow.WebviewWindow('quitWindow', { url: 'quit.html', height: 200, width: 400, center: true });
+    const webview = new Twindow.WebviewWindow('quitWindow', { url: 'message.html#Closing', height: 200, width: 400, center: true });
     await binary_frontends.stop_all()
     await docker_frontends.stop_all()
     await webview.close()
@@ -242,7 +244,7 @@ async function quitApp() {
 }
 
 async function refreshApp() {
-    const webview = new Twindow.WebviewWindow('refreshWindow', { url: 'refresh.html', height: 200, width: 400, center: true });
+    const webview = new Twindow.WebviewWindow('refreshWindow', { url: 'message.html#Refreshing', height: 200, width: 400, center: true });
     await binary_frontends.stop_all()
     await docker_frontends.stop_all()
     await webview.close()

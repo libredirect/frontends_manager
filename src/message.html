@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="assets/stylesheets/styles.css">
-    <title>Closing</title>
     <style type="text/css">
         div {
             display: flex;
@@ -19,8 +18,13 @@
 
 <body>
     <div>
-        <h1>Closing...</h1>
+        <h1 id="message"></h1>
     </div>
+    <script>
+        const message = decodeURIComponent(window.location.hash.substring(1)) + '...'
+        document.title = message
+        document.getElementById("message").innerHTML = message
+    </script>
 </body>
 
 </html>

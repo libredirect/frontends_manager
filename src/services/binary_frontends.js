@@ -2,7 +2,6 @@ const shell = window.__TAURI__.shell;
 const path = window.__TAURI__.path;
 const fs = window.__TAURI__.fs;
 const http = window.__TAURI__.http
-const dialog = window.__TAURI__.dialog
 
 Object.values = function (obj) {
     return Object.keys(obj).map(key => obj[key])
@@ -15,8 +14,6 @@ let config;
     config = JSON.parse(await fs.readTextFile(await path.resolveResource('frontends.json')))
 })();
 let frontendsProcesses = {}
-
-
 
 function formatEnv(env) {
     if (env === undefined) return null
@@ -32,7 +29,6 @@ async function run_caddy() {
     platform = await window.__TAURI__.os.platform()
     const result = await check_downloaded('caddy')
     if (result == 'not_downloaded') {
-        await dialog.message('Downloading Caddy...', { title: 'Closing' });
         let filename
         let url
         if (platform == 'linux') {

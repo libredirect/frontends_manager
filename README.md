@@ -7,6 +7,7 @@ For anonymizing your IP, use [Lokinet](https://lokinet.org/)
 
 Available Frontends:
 - [LibReddit](https://github.com/spikecodes/libreddit)
+- [Teddit](https://github.com/teddit-net/teddit)
 - [Nitter](https://github.com/zedeus/nitter)
 - [Rimgo](https://codeberg.org/video-prize-ranch/rimgo)
 - [SimplyTranslate](https://git.sr.ht/~metalune/simplytranslate_web)
@@ -18,7 +19,6 @@ Available Frontends:
 - [Quetre](https://github.com/zyachel/quetre)
 - [LibreMDb](https://github.com/zyachel/libremdb)
 - [SearXNG](https://github.com/searxng/searxng)
-- [Teddit](https://github.com/teddit-net/teddit)
 
 For Managing the frontends:
 - Web Server: [Caddy](https://caddyserver.com/)
@@ -27,6 +27,7 @@ For Managing the frontends:
 - GUI: [Tauri](https://tauri.app/)
 
 ## Development
+Install [Node.js](https://nodejs.org)\
 Install [Rust](https://www.rust-lang.org/)\
 Install [Docker](https://www.docker.com/)
 ```bash
