@@ -2,16 +2,21 @@ const shell = window.__TAURI__.shell;
 const path = window.__TAURI__.path;
 const fs = window.__TAURI__.fs;
 const http = window.__TAURI__.http
+const dialog = window.__TAURI__.dialog
 
 Object.values = function (obj) {
     return Object.keys(obj).map(key => obj[key])
 }
 
 let platform;
+let config;
 (async () => {
     platform = await window.__TAURI__.os.platform()
+    config = JSON.parse(await fs.readTextFile(await path.resolveResource('frontends.json')))
 })();
 let frontendsProcesses = {}
+
+
 
 function formatEnv(env) {
     if (env === undefined) return null
@@ -24,21 +29,40 @@ function formatEnv(env) {
 }
 
 async function run_caddy() {
-    let command
-    if (platform == 'win32') {
-        command = "$RESOURCE\\caddy\\caddy_windows_amd64.exe"
-    } else if (platform == 'linux') {
-        command = './caddy_linux_amd64'
+    platform = await window.__TAURI__.os.platform()
+    const result = await check_downloaded('caddy')
+    if (result == 'not_downloaded') {
+        await dialog.message('Downloading Caddy...', { title: 'Closing' });
+        let filename
+        let url
+        if (platform == 'linux') {
+            filename = 'caddy_linux_amd64'
+            url = 'https://caddyserver.com/api/download?os=linux&arch=amd64'
+        } else if (platform == 'win32') {
+            filename = 'caddy_windows_amd64.exe'
+            url = 'https://caddyserver.com/api/download?os=windows&arch=amd64'
+        }
+        filename = await path.join('caddy', filename)
+        const response = await http.fetch(url, { method: 'GET', responseType: http.ResponseType.Binary });
+        await fs.createDir('caddy', { dir: fs.BaseDirectory.AppLocalData, recursive: true });
+        await fs.copyFile('Caddyfile', await path.join(await path.appLocalDataDir(), 'caddy', 'Caddyfile'));
+        await fs.writeBinaryFile(filename, new Uint8Array(response.data), { dir: fs.BaseDirectory.AppLocalData });
+        if (platform == 'linux') {
+            await new shell.Command('chmod', ['u+x', filename], { cwd: await path.join(await path.appLocalDataDir()) }).execute();
+        }
     }
-    const cmd = new shell.Command(command, ['run'], { cwd: await path.resolveResource('caddy') })
-    const child = await cmd.spawn();
-    frontendsProcesses['caddy'] = child
-    return true
+    await run_frontend('caddy')
 }
 
 
-async function run_frontend(name, command, args, env) {
-    const cmd = new shell.Command(command, args, { cwd: await path.join(await path.appLocalDataDir(), name), env: formatEnv(env) })
+async function run_frontend(name) {
+    let command
+    if (platform == 'win32') {
+        command = config[name].command_windows
+    } else if (platform == 'linux') {
+        command = config[name].command_linux
+    }
+    const cmd = new shell.Command(command, config[name].args, { cwd: await path.join(await path.appLocalDataDir(), name), env: formatEnv(config[name].env) })
     cmd.on('error', error => {
         console.error(`command error: "${error}"`)
         return 'downloaded'

@@ -13,10 +13,14 @@
   "tauri": {
     "allowlist": {
       "all": false,
+      "dialog": {
+        "all": true
+      },
       "http": {
         "all": true,
         "scope": [
-          "https://github.com/libredirect/frontends_binaries/raw/main/*"
+          "https://github.com/libredirect/frontends_binaries/raw/main/*",
+          "https://caddyserver.com/api/*"
         ]
       },
       "process": {
@@ -28,7 +32,8 @@
         "all": true,
         "scope": [
           "$RESOURCE/*",
-          "$APPLOCALDATA/*"
+          "$APPLOCALDATA/*",
+          "$APPLOCALDATA/caddy/*"
         ]
       },
       "os": {
@@ -116,6 +121,11 @@
             "name": "tar",
             "cmd": "tar",
             "args": true
+          },
+          {
+            "name": "chmod",
+            "cmd": "chmod",
+            "args": true
           }
         ]
       },
@@ -135,12 +145,19 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
+      "category": "Utility",
+      "shortDescription": "Run privacy frontends on your computer",
       "identifier": "org.libredirect.frontends-manager",
-      "targets": "all",
+      "targets": [
+        "deb",
+        "appimage",
+        "nsis",
+        "updater"
+      ],
       "resources": [
         "frontends.json",
         "docker_frontends",
-        "caddy"
+        "Caddyfile"
       ]
     },
     "updater": {

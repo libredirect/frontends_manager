@@ -8,6 +8,7 @@ const fs = window.__TAURI__.fs;
 const process = window.__TAURI__.process;
 const event = window.__TAURI__.event
 
+
 document.getElementById("refresh").addEventListener("click", async () => await refreshApp())
 document.getElementById("quit").addEventListener("click", quitApp)
 
@@ -23,6 +24,7 @@ let frontends_running = {};
     }
     for (const key in config) {
         if (!config[key].docker && ((platform == 'linux' && !config[key].command_linux) || (platform == 'win32' && !config[key].command_windows))) continue
+        if (key == 'caddy') continue
         const tile = document.createElement('div')
         tile.classList.add('tile')
         tile.innerHTML = `
@@ -60,12 +62,7 @@ let frontends_running = {};
                 frontends_running[key] = 'starting'
                 running_buttons()
                 if (!config[key].docker) {
-                    frontends_running[key] = await binary_frontends.run_frontend(
-                        key,
-                        ({ "linux": config[key].command_linux, "win32": config[key].command_windows })[platform],
-                        config[key].args,
-                        config[key].env
-                    )
+                    frontends_running[key] = await binary_frontends.run_frontend(key)
                 } else {
                     frontends_running[key] = await docker_frontends.run_frontend(key)
                 }

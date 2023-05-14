@@ -68,7 +68,7 @@ async function remove_frontend(name) {
     return new Promise(async resolve => {
         const cmd = await docker_command(name, 'down')
         cmd.on('error', error => { console.error(`command error: "${error}"`); resolve(true) });
-        // cmd.stdout.on('data', line => console.log(line))
+        cmd.stdout.on('data', line => console.log(line))
         cmd.stderr.on('data', () => resolve('not_downloaded'))
         await cmd.spawn();
     })
@@ -77,7 +77,6 @@ async function remove_frontend(name) {
 function health() {
     return new Promise(async resolve => {
         const cmd = new shell.Command('docker', ['compose', 'version'])
-        console.log(cmd)
         cmd.on('error', () => resolve('not_installed'));
         cmd.stderr.on('data', () => resolve('not_installed'))
         cmd.stdout.on('data', async () => {
