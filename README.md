@@ -27,9 +27,7 @@ For Managing the frontends:
 - GUI: [Tauri](https://tauri.app/)
 
 ## Development
-Install [Node.js](https://nodejs.org)\
-Install [Rust](https://www.rust-lang.org/)\
-Install [Docker](https://www.docker.com/)
+Install [Node.js](https://nodejs.org), [Rust](https://www.rust-lang.org/), [Docker](https://www.docker.com/)
 ```bash
 git clone https://github.com/libredirect/frontends_manager
 cd frontends_manager
