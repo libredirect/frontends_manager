@@ -1,6 +1,6 @@
 [package]
 name = "libredirect_frontends_manager"
-version = "0.0.6"
+version = "0.0.7"
 description = "Host privacy frontends locally on your computer rather than relying on 3rd party instances"
 authors = ["you"]
 license = ""
