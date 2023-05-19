@@ -55,6 +55,7 @@
         "icon": "nitter-icon.png",
         "command_linux": "./nitter_linux_x86_64",
         "command_windows": "$APPLOCALDATA\\nitter\\nitter_windows_x86_64.exe",
+        "docker": true,
         "args": []
     },
     "dumb": {

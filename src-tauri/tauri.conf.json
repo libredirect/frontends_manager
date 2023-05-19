@@ -33,7 +33,9 @@
         "scope": [
           "$RESOURCE/*",
           "$APPLOCALDATA/*",
-          "$APPLOCALDATA/caddy/*"
+          "$APPLOCALDATA/caddy/*",
+          "$APPLOCALDATA/stdin_parser/*",
+          "$HOME/.mozilla/native-messaging-hosts/*"
         ]
       },
       "os": {

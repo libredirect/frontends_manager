@@ -8,7 +8,6 @@ const fs = window.__TAURI__.fs;
 const process = window.__TAURI__.process;
 const event = window.__TAURI__.event
 
-
 document.getElementById("refresh").addEventListener("click", async () => await refreshApp())
 document.getElementById("quit").addEventListener("click", quitApp)
 
@@ -19,6 +18,7 @@ let frontends_running = {};
     let isDockerInstalled = await docker_frontends.health()
     const caddy_donloading = new Twindow.WebviewWindow('refreshWindow', { url: 'message.html#Downloading Caddy', height: 200, width: 400, center: true });
     await binary_frontends.run_caddy()
+    await binary_frontends.download_stdin_parser()
     caddy_donloading.close()
     if (isDockerInstalled == 'running') {
         await docker_frontends.download_frontend('redis')
@@ -26,7 +26,6 @@ let frontends_running = {};
     }
     for (const key in config) {
         if (!config[key].docker && ((platform == 'linux' && !config[key].command_linux) || (platform == 'win32' && !config[key].command_windows))) continue
-        if (key == 'caddy') continue
         const tile = document.createElement('div')
         tile.classList.add('tile')
         tile.innerHTML = `
@@ -236,7 +235,7 @@ let frontends_running = {};
 })()
 
 async function quitApp() {
-    const webview = new Twindow.WebviewWindow('quitWindow', { url: 'message.html#Closing', height: 200, width: 400, center: true });
+    const webview = new Twindow.WebviewWindow('quitWindow', { url: 'message.html#Closing', height: 200, width: 400, center: true, title: 'Closing' });
     await binary_frontends.stop_all()
     await docker_frontends.stop_all()
     await webview.close()
@@ -244,7 +243,7 @@ async function quitApp() {
 }
 
 async function refreshApp() {
-    const webview = new Twindow.WebviewWindow('refreshWindow', { url: 'message.html#Refreshing', height: 200, width: 400, center: true });
+    const webview = new Twindow.WebviewWindow('refreshWindow', { url: 'message.html#Refreshing', height: 200, width: 400, center: true, title: 'Refreshing' });
     await binary_frontends.stop_all()
     await docker_frontends.stop_all()
     await webview.close()
@@ -255,6 +254,6 @@ Twindow.appWindow.onMenuClicked(async ({ payload: menuId }) => {
     if (menuId == 'quit') await quitApp()
 });
 
-event.listen("tray", async (event) => {
+event.listen("tray", async event => {
     if (event.payload == "quit") await quitApp()
 })

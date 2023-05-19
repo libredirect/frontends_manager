@@ -43,7 +43,7 @@ async function run_caddy() {
         await fs.createDir('caddy', { dir: fs.BaseDirectory.AppLocalData, recursive: true });
         await fs.writeBinaryFile(filename, new Uint8Array(response.data), { dir: fs.BaseDirectory.AppLocalData });
         if (platform == 'linux') {
-            await new shell.Command('chmod', ['u+x', filename], { cwd: await path.join(await path.appLocalDataDir()) }).execute();
+            await new shell.Command('chmod', ['u+x', filename], { cwd: await path.appLocalDataDir() }).execute();
         }
     }
     let command
@@ -60,6 +60,34 @@ async function run_caddy() {
     const child = await cmd.spawn();
     frontendsProcesses['caddy'] = child
     return 'running'
+}
+
+async function download_stdin_parser() {
+    if (await check_downloaded('stdin_parser') == "not_downloaded") {
+        let filename
+        if (platform == "linux") {
+            filename = "stdin_parser_linux_x86_64"
+        } else if (platform = "win32") {
+            filename = "stdin_parser_windows_x86_64.exe"
+        }
+
+        await download_frontend('stdin_parser')
+        const _path = await path.join('stdin_parser', 'org.libredirect.stdin_parser.json')
+        let data = JSON.parse(await fs.readTextFile(_path, { dir: fs.BaseDirectory.AppLocalData }));
+        data.path = await path.join(await path.appLocalDataDir(), 'stdin_parser', filename)
+        await fs.writeTextFile(_path, JSON.stringify(data), { dir: fs.BaseDirectory.AppLocalData })
+
+        if (platform == "linux") {
+            await fs.copyFile(_path, await path.join(await path.homeDir(), '.mozilla', 'native-messaging-hosts', 'org.libredirect.stdin_parser.json'), { dir: fs.BaseDirectory.AppLocalData })
+        }
+    }
+    (async () => {
+        while (true) {
+            const data = await fs.readTextFile(await path.join('stdin_parser', 'settings.json'), { dir: fs.BaseDirectory.AppLocalData })
+            console.log(JSON.parse(data))
+            await new Promise(resolve => setTimeout(async () => resolve(), 1000))
+        }
+    })()
 }
 
 async function run_frontend(name) {
@@ -140,4 +168,5 @@ export default {
     stop_frontend,
     run_frontend,
     download_frontend,
+    download_stdin_parser
 }
