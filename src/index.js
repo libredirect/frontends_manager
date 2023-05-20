@@ -16,10 +16,8 @@ let frontends_running = {};
     const platform = await window.__TAURI__.os.platform()
     const config = JSON.parse(await fs.readTextFile(await path.resolveResource('frontends.json')))
     let isDockerInstalled = await docker_frontends.health()
-    const caddy_donloading = new Twindow.WebviewWindow('refreshWindow', { url: 'message.html#Downloading Caddy', height: 200, width: 400, center: true });
     await binary_frontends.run_caddy()
     await binary_frontends.download_stdin_parser()
-    caddy_donloading.close()
     if (isDockerInstalled == 'running') {
         await docker_frontends.download_frontend('redis')
         await docker_frontends.run_frontend('redis')
@@ -243,7 +241,10 @@ async function quitApp() {
 }
 
 async function refreshApp() {
-    const webview = new Twindow.WebviewWindow('refreshWindow', { url: 'message.html#Refreshing', height: 200, width: 400, center: true, title: 'Refreshing' });
+    const webview = new Twindow.WebviewWindow(
+        'refreshWindow',
+        { url: 'message.html#Refreshing', height: 200, width: 400, center: true, title: 'Refreshing' }
+    );
     await binary_frontends.stop_all()
     await docker_frontends.stop_all()
     await webview.close()

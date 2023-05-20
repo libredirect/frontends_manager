@@ -76,17 +76,21 @@ async function remove_frontend(name) {
 
 function health() {
     return new Promise(async resolve => {
-        const cmd = new shell.Command('docker', ['compose', 'version'])
-        cmd.on('error', () => resolve('not_installed'));
-        cmd.stderr.on('data', () => resolve('not_installed'))
-        cmd.stdout.on('data', async () => {
-            const cmd = new shell.Command('docker', ['ps'])
-            cmd.on('error', () => resolve('not_running'));
-            cmd.stdout.on('data', () => resolve('running'))
-            cmd.stderr.on('data', () => resolve('not_running'))
+        try {
+            const cmd = new shell.Command('docker', ['compose', 'version'])
+            cmd.on('error', () => resolve('not_installed'));
+            cmd.stderr.on('data', () => resolve('not_installed'))
+            cmd.stdout.on('data', async () => {
+                const cmd = new shell.Command('docker', ['ps'])
+                cmd.on('error', () => resolve('not_running'));
+                cmd.stdout.on('data', () => resolve('running'))
+                cmd.stderr.on('data', () => resolve('not_running'))
+                await cmd.spawn();
+            })
             await cmd.spawn();
-        })
-        await cmd.spawn();
+        } catch (error) {
+            resolve('not_installed')
+        }
     })
 }
 

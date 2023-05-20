@@ -1,7 +1,9 @@
+const Twindow = window.__TAURI__.window
 const shell = window.__TAURI__.shell;
 const path = window.__TAURI__.path;
 const fs = window.__TAURI__.fs;
-const http = window.__TAURI__.http
+const http = window.__TAURI__.http;
+import { watch } from "tauri-plugin-fs-watch-api";
 
 Object.values = function (obj) {
     return Object.keys(obj).map(key => obj[key])
@@ -29,6 +31,7 @@ async function run_caddy() {
     platform = await window.__TAURI__.os.platform()
     const result = await check_downloaded('caddy')
     if (result == 'not_downloaded') {
+        const caddy_donloading = new Twindow.WebviewWindow('refreshWindow', { url: 'message.html#Downloading Caddy', height: 200, width: 400, center: true });
         let filename
         let url
         if (platform == 'linux') {
@@ -45,6 +48,7 @@ async function run_caddy() {
         if (platform == 'linux') {
             await new shell.Command('chmod', ['u+x', filename], { cwd: await path.appLocalDataDir() }).execute();
         }
+        caddy_donloading.close()
     }
     let command
     if (platform == 'win32') {
@@ -81,13 +85,6 @@ async function download_stdin_parser() {
             await fs.copyFile(_path, await path.join(await path.homeDir(), '.mozilla', 'native-messaging-hosts', 'org.libredirect.stdin_parser.json'), { dir: fs.BaseDirectory.AppLocalData })
         }
     }
-    (async () => {
-        while (true) {
-            const data = await fs.readTextFile(await path.join('stdin_parser', 'settings.json'), { dir: fs.BaseDirectory.AppLocalData })
-            console.log(JSON.parse(data))
-            await new Promise(resolve => setTimeout(async () => resolve(), 1000))
-        }
-    })()
 }
 
 async function run_frontend(name) {

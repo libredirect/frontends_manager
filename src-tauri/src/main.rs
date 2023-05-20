@@ -6,6 +6,7 @@ use tauri::{
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_fs_watch::init())
         .system_tray(
             SystemTray::new().with_menu(
                 SystemTrayMenu::new()
