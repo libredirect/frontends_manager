@@ -6,7 +6,7 @@ const Twindow = window.__TAURI__.window
 const path = window.__TAURI__.path;
 const fs = window.__TAURI__.fs;
 const process = window.__TAURI__.process;
-const event = window.__TAURI__.event
+const event = window.__TAURI__.event;
 
 document.getElementById("refresh").addEventListener("click", async () => await refreshApp())
 document.getElementById("quit").addEventListener("click", quitApp)

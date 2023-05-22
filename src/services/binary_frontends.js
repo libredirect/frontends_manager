@@ -3,7 +3,7 @@ const shell = window.__TAURI__.shell;
 const path = window.__TAURI__.path;
 const fs = window.__TAURI__.fs;
 const http = window.__TAURI__.http;
-import { watch } from "tauri-plugin-fs-watch-api";
+import { watch } from "./fs-watch.js";
 
 Object.values = function (obj) {
     return Object.keys(obj).map(key => obj[key])
@@ -85,6 +85,22 @@ async function download_stdin_parser() {
             await fs.copyFile(_path, await path.join(await path.homeDir(), '.mozilla', 'native-messaging-hosts', 'org.libredirect.stdin_parser.json'), { dir: fs.BaseDirectory.AppLocalData })
         }
     }
+    await watch(await path.join(await path.appLocalDataDir(), 'stdin_parser', 'settings.json'),
+        async () => {
+            const data = JSON.parse(JSON.parse(await fs.readTextFile(await path.join('stdin_parser', 'settings.json'), { dir: fs.BaseDirectory.AppLocalData })))
+            console.log(data)
+            for (const frontend of data) {
+                console.log(frontend)
+                if (frontend in config && config[frontend].command_linux) {
+                    if (await check_downloaded(frontend) == "not_downloaded") {
+                        await download_frontend(frontend)
+                    }
+                    await run_frontend(frontend)
+                }
+            }
+        },
+        { recursive: true }
+    );
 }
 
 async function run_frontend(name) {
