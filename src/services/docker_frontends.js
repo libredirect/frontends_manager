@@ -22,7 +22,7 @@ async function download_frontend(name) {
 async function check_downloaded(name) {
     return new Promise(async resolve => {
         const cmd = new shell.Command(
-            'docker', ['ps', '-q', '-a', '--format', 'json', '--filter', `name=${name}`],
+            'docker', ['ps', '-a', '--format', 'json', '--filter', `name=${name}`],
             { cwd: await path.resolveResource('docker_frontends') }
         )
         cmd.on('close', () => resolve('not_downloaded'));

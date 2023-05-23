@@ -3,7 +3,6 @@ const shell = window.__TAURI__.shell;
 const path = window.__TAURI__.path;
 const fs = window.__TAURI__.fs;
 const http = window.__TAURI__.http;
-import { watch } from "./fs-watch.js";
 
 Object.values = function (obj) {
     return Object.keys(obj).map(key => obj[key])
@@ -64,43 +63,6 @@ async function run_caddy() {
     const child = await cmd.spawn();
     frontendsProcesses['caddy'] = child
     return 'running'
-}
-
-async function download_stdin_parser() {
-    if (await check_downloaded('stdin_parser') == "not_downloaded") {
-        let filename
-        if (platform == "linux") {
-            filename = "stdin_parser_linux_x86_64"
-        } else if (platform = "win32") {
-            filename = "stdin_parser_windows_x86_64.exe"
-        }
-
-        await download_frontend('stdin_parser')
-        const _path = await path.join('stdin_parser', 'org.libredirect.stdin_parser.json')
-        let data = JSON.parse(await fs.readTextFile(_path, { dir: fs.BaseDirectory.AppLocalData }));
-        data.path = await path.join(await path.appLocalDataDir(), 'stdin_parser', filename)
-        await fs.writeTextFile(_path, JSON.stringify(data), { dir: fs.BaseDirectory.AppLocalData })
-
-        if (platform == "linux") {
-            await fs.copyFile(_path, await path.join(await path.homeDir(), '.mozilla', 'native-messaging-hosts', 'org.libredirect.stdin_parser.json'), { dir: fs.BaseDirectory.AppLocalData })
-        }
-    }
-    await watch(await path.join(await path.appLocalDataDir(), 'stdin_parser', 'settings.json'),
-        async () => {
-            const data = JSON.parse(JSON.parse(await fs.readTextFile(await path.join('stdin_parser', 'settings.json'), { dir: fs.BaseDirectory.AppLocalData })))
-            console.log(data)
-            for (const frontend of data) {
-                console.log(frontend)
-                if (frontend in config && config[frontend].command_linux) {
-                    if (await check_downloaded(frontend) == "not_downloaded") {
-                        await download_frontend(frontend)
-                    }
-                    await run_frontend(frontend)
-                }
-            }
-        },
-        { recursive: true }
-    );
 }
 
 async function run_frontend(name) {
@@ -181,5 +143,4 @@ export default {
     stop_frontend,
     run_frontend,
     download_frontend,
-    download_stdin_parser
 }

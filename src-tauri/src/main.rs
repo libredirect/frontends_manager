@@ -12,8 +12,7 @@ struct Payload {
 
 fn main() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_fs_watch::init())
-        .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {}))
+        .plugin(tauri_plugin_single_instance::init(|_app, _argv, _cwd| {}))
         .system_tray(
             SystemTray::new().with_menu(
                 SystemTrayMenu::new()

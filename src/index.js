@@ -17,7 +17,6 @@ let frontends_running = {};
     const config = JSON.parse(await fs.readTextFile(await path.resolveResource('frontends.json')))
     let isDockerInstalled = await docker_frontends.health()
     await binary_frontends.run_caddy()
-    await binary_frontends.download_stdin_parser()
     if (isDockerInstalled == 'running') {
         await docker_frontends.download_frontend('redis')
         await docker_frontends.run_frontend('redis')
