@@ -112,6 +112,9 @@ function download_frontend(name) {
 
 async function check_downloaded(name) {
     if (await fs.exists(`${name}`, { dir: fs.BaseDirectory.AppLocalData })) {
+        if (name in frontendsProcesses) {
+            return "running"
+        }
         return 'downloaded'
     } else {
         return 'not_downloaded'
@@ -122,16 +125,28 @@ async function remove_frontend(name) {
     return 'not_downloaded'
 }
 
-async function stop_frontend(name, slice) {
+async function stop_frontend(name, remove) {
     const result = await frontendsProcesses[name].kill();
-    if (slice) delete [name]
+    if (remove) delete frontendsProcesses[name]
     if (result == null) return 'downloaded'
     else return 'running'
 }
 
 async function stop_all() {
+    const keys = Object.keys(frontendsProcesses)
+    const i = keys.indexOf("caddy"); if (i > -1) keys.splice(i, 1);
+
+    await fs.writeTextFile("binary_frontends.json", JSON.stringify(keys), { dir: fs.BaseDirectory.AppLocalData })
     for (const name of Object.keys(frontendsProcesses)) {
         await stop_frontend(name, false)
+    }
+}
+
+async function startup() {
+    if (await fs.exists("binary_frontends.json", { dir: fs.BaseDirectory.AppLocalData })) {
+        for (const name of JSON.parse(await fs.readTextFile("binary_frontends.json", { dir: fs.BaseDirectory.AppLocalData }))) {
+            await run_frontend(name)
+        }
     }
 }
 
@@ -143,4 +158,5 @@ export default {
     stop_frontend,
     run_frontend,
     download_frontend,
+    startup
 }

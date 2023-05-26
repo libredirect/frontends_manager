@@ -17,9 +17,11 @@ let frontends_running = {};
     const config = JSON.parse(await fs.readTextFile(await path.resolveResource('frontends.json')))
     let isDockerInstalled = await docker_frontends.health()
     await binary_frontends.run_caddy()
+    await binary_frontends.startup()
     if (isDockerInstalled == 'running') {
         await docker_frontends.download_frontend('redis')
         await docker_frontends.run_frontend('redis')
+        await docker_frontends.startup()
     }
     for (const key in config) {
         if (!config[key].docker && ((platform == 'linux' && !config[key].command_linux) || (platform == 'win32' && !config[key].command_windows))) continue
@@ -230,6 +232,7 @@ let frontends_running = {};
         }
     }
 })()
+
 
 async function quitApp() {
     const webview = new Twindow.WebviewWindow('quitWindow', { url: 'message.html#Closing', height: 200, width: 400, center: true, title: 'Closing' });

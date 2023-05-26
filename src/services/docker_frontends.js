@@ -1,6 +1,7 @@
 const shell = window.__TAURI__.shell;
 const path = window.__TAURI__.path;
-const tauri = window.__TAURI__.tauri
+const tauri = window.__TAURI__.tauri;
+const fs = window.__TAURI__.fs;
 
 let frontendsProcessesDocker = []
 
@@ -95,9 +96,17 @@ function health() {
 }
 
 async function stop_all() {
-    console.log(frontendsProcessesDocker)
+    await fs.writeTextFile("docker_frontends.json", JSON.stringify(frontendsProcessesDocker), { dir: fs.BaseDirectory.AppLocalData })
     for (const name of frontendsProcessesDocker) {
         await stop_frontend(name, false)
+    }
+}
+
+async function startup() {
+    if (await fs.exists("docker_frontends.json", { dir: fs.BaseDirectory.AppLocalData })) {
+        for (const name of JSON.parse(await fs.readTextFile("docker_frontends.json", { dir: fs.BaseDirectory.AppLocalData }))) {
+            await run_frontend(name)
+        }
     }
 }
 
@@ -108,5 +117,6 @@ export default {
     remove_frontend,
     check_downloaded,
     health,
-    stop_all
+    stop_all,
+    startup
 }
