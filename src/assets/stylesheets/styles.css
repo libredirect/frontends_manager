@@ -143,3 +143,62 @@ svg {
 .note a:hover {
 	text-decoration: underline;
 }
+
+div.some-block h4 {
+	font-size: 18px;
+}
+
+div.some-block {
+	width: 300px;
+	padding: 0 15px;
+	justify-content: space-between;
+	display: flex;
+	align-items: center;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+
+div.some-block input[type="checkbox"] {
+	width: 46px;
+	height: 23px;
+	background-color: var(--light-grey);
+	border-radius: 50px;
+	transition: 0.4s;
+	cursor: pointer;
+	appearance: none;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+}
+
+div.some-block input[type="checkbox"]:checked {
+	background-color: var(--active);
+}
+
+div.some-block input[type="checkbox"]::before {
+	content: "";
+	display: inline-block;
+	width: 18px;
+	height: 18px;
+	box-sizing: border-box;
+	position: relative;
+	top: 2.5px;
+	left: 3.5px;
+	background-color: white;
+	border-radius: 50%;
+	transition: 0.3s;
+}
+
+body.rtl div.some-block input[type="checkbox"]::before {
+	left: auto;
+	right: 4px;
+}
+
+div.some-block input[type="checkbox"]:checked::before {
+	left: 24px;
+}
+
+body.rtl div.some-block input[type="checkbox"]:checked::before {
+	left: auto;
+	right: 24px;
+}

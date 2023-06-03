@@ -165,7 +165,7 @@
     },
     "windows": [
       {
-        "fullscreen": false,
+        "maximized": true,
         "resizable": true,
         "title": "Libredirect Frontends Manager",
         "width": 1200,

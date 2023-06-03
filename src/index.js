@@ -1,6 +1,7 @@
 import binary_frontends from './services/binary_frontends.js'
 import docker_frontends from './services/docker_frontends.js'
 import icons from './services/icons.js'
+import { enable, isEnabled, disable } from "./services/tauri-plugin-autostart-api.js";
 
 const Twindow = window.__TAURI__.window
 const path = window.__TAURI__.path;
@@ -9,7 +10,19 @@ const process = window.__TAURI__.process;
 const event = window.__TAURI__.event;
 
 document.getElementById("refresh").addEventListener("click", async () => await refreshApp())
-document.getElementById("quit").addEventListener("click", quitApp)
+document.getElementById("settings").addEventListener("click", async () => {
+    const settings = await new Twindow.WebviewWindow(
+        'settings',
+        {
+            url: 'settings.html',
+            height: 600,
+            width: 400,
+            center: true,
+            title: 'Settings'
+        });
+    await settings.show()
+    await settings.center()
+})
 
 let frontends_running = {};
 (async () => {
