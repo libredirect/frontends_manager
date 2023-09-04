@@ -15,8 +15,12 @@
     "rimgo": {
         "name": "Rimgo",
         "icon": "rimgo-icon.png",
-        "command_linux": "./rimgo_linux_x86_64",
-        "command_windows": "$APPLOCALDATA\\rimgo\\rimgo_windows_x86_64.exe",
+        "download_linux": "https://codeberg.org/rimgo/rimgo/releases/download/v1.2.0/rimgo-linux-amd64.tar.gz",
+        "filename_linux": "rimgo-linux-amd64.tar.gz",
+        "command_linux": "./rimgo",
+        "download_windows": "https://codeberg.org/rimgo/rimgo/releases/download/v1.2.0/rimgo-windows-amd64.zip",
+        "filename_windows": "rimgo-windows-amd64.zip",
+        "command_windows": "$APPLOCALDATA\\rimgo\\rimgo.exe",
         "args": [],
         "env": [
             "ADDRESS=127.0.0.1",
@@ -91,11 +95,6 @@
     "searxng": {
         "name": "SearXNG",
         "icon": "searxng.png",
-        "docker": true
-    },
-    "teddit": {
-        "name": "Teddit",
-        "icon": "teddit.png",
         "docker": true
     },
     "lingva": {
