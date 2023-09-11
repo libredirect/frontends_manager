@@ -21,7 +21,8 @@
         <h1 id="message"></h1>
     </div>
     <script>
-        document.getElementById("message").innerHTML = decodeURIComponent(window.location.hash.substring(1)) + '...'
+        const message = decodeURIComponent(window.location.hash.substring(1)) + '...'
+        document.getElementById("message").innerHTML = message
     </script>
 </body>
 

@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  teddit:
+    container_name: teddit
+    image: teddit/teddit:latest
+    environment:
+      - DOMAIN=teddit.localhost:8080
+      - USE_HELMET=true
+      - USE_HELMET_HSTS=true
+      - TRUST_PROXY=true
+      - REDIS_HOST=host.docker.internal
+    ports:
+      - "127.0.0.1:10053:8080"
+    networks:
+      - teddit_net
+    healthcheck:
+      test: ["CMD", "wget" ,"--no-verbose", "--tries=1", "--spider", "http://teddit.localhost:8080/about"]
+      interval: 1m
+      timeout: 3s
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+
+networks:
+  teddit_net:

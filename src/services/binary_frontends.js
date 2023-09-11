@@ -73,6 +73,7 @@ async function run_frontend(name) {
         command = config[name].command_linux
     }
     const cmd = new shell.Command(command, config[name].args, { cwd: await path.join(await path.appLocalDataDir(), name), env: formatEnv(config[name].env) })
+    console.log(cmd)
     cmd.on('error', error => {
         console.error(`command error: "${error}"`)
         return 'downloaded'
@@ -85,28 +86,24 @@ async function run_frontend(name) {
 function download_frontend(name) {
     return new Promise(async resolve => {
         let filename
-        let url
-        const dir = name
-        if (!(await fs.exists(dir, { dir: fs.BaseDirectory.AppLocalData }))) {
-            await fs.createDir(dir, { dir: fs.BaseDirectory.AppLocalData });
-        }
         if (platform == 'linux') {
-            filename = config[name].filename_linux ?? `${name}_linux_x86_64.tar.gz`
-            url = config[name].download_linux ?? `https://github.com/libredirect/frontends_binaries/raw/main/binaries/${filename}`
+            filename = `${name}_linux_x86_64.tar.gz`
         } else if (platform == 'win32') {
-            filename = config[name].filename_windows ?? `${name}_windows_x86_64.zip`
-            url = config[name].download_windows ?? `https://github.com/libredirect/frontends_binaries/raw/main/binaries/${filename}`
+            filename = `${name}_windows_x86_64.zip`
         }
-        const response = await http.fetch(url, { method: 'GET', responseType: http.ResponseType.Binary });
-        await fs.writeBinaryFile(await path.join(name, filename), new Uint8Array(response.data), { dir: fs.BaseDirectory.AppLocalData });
+        const response = await http.fetch(
+            `https://github.com/libredirect/frontends_binaries/raw/main/binaries/${filename}`,
+            { method: 'GET', responseType: http.ResponseType.Binary }
+        );
+        await fs.writeBinaryFile(filename, new Uint8Array(response.data), { dir: fs.BaseDirectory.AppLocalData });
         let extract_cmd
         if (platform == 'linux') {
-            extract_cmd = new shell.Command('tar', ['-xzf', filename], { cwd: await path.join(await path.appLocalDataDir(), name) })
+            extract_cmd = new shell.Command('tar', ['-xzf', filename], { cwd: await path.appLocalDataDir() })
         } else if (platform == 'win32') {
-            extract_cmd = new shell.Command('tar', ['-xf', filename], { cwd: await path.join(await path.appLocalDataDir(), name) })
+            extract_cmd = new shell.Command('tar', ['-xf', filename], { cwd: await path.appLocalDataDir() })
         }
         extract_cmd.on('close', async () => {
-            await fs.removeFile(await path.join(name, filename), { dir: fs.BaseDirectory.AppLocalData })
+            await fs.removeFile(filename, { dir: fs.BaseDirectory.AppLocalData })
             resolve('downloaded')
         });
         await extract_cmd.spawn();

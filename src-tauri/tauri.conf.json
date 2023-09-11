@@ -20,8 +20,7 @@
         "all": true,
         "scope": [
           "https://github.com/libredirect/frontends_binaries/raw/main/*",
-          "https://caddyserver.com/api/*",
-          "https://codeberg.org/*"
+          "https://caddyserver.com/api/*"
         ]
       },
       "process": {
@@ -31,14 +30,11 @@
       },
       "fs": {
         "all": true,
-        "scope": {
-          "allow": [
-            "$RESOURCE/*",
-            "$APPLOCALDATA/*",
-            "$APPLOCALDATA/*/*"
-          ],
-          "requireLiteralLeadingDot": false
-        }
+        "scope": [
+          "$RESOURCE/*",
+          "$APPLOCALDATA/*",
+          "$APPLOCALDATA/caddy/*"
+        ]
       },
       "os": {
         "all": true
@@ -57,8 +53,8 @@
             "args": true
           },
           {
-            "name": "./rimgo",
-            "cmd": "./rimgo",
+            "name": "./rimgo_linux_x86_64",
+            "cmd": "./rimgo_linux_x86_64",
             "args": true
           },
           {
@@ -92,8 +88,8 @@
             "args": true
           },
           {
-            "name": "$APPLOCALDATA\\rimgo\\rimgo.exe",
-            "cmd": "$APPLOCALDATA\\rimgo\\rimgo.exe",
+            "name": "$APPLOCALDATA\\rimgo\\rimgo_windows_x86_64.exe",
+            "cmd": "$APPLOCALDATA\\rimgo\\rimgo_windows_x86_64.exe",
             "args": true
           },
           {
