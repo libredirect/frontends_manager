@@ -48,7 +48,10 @@
         "name": "SimplyTranslate",
         "icon": "simplytranslate-icon.png",
         "command_linux": "./simplytranslate_linux_x86_64",
-        "args": []
+        "args": [],
+        "env": [
+            "ADDRESS=127.0.0.1:10044"
+        ]
     },
     "nitter": {
         "name": "Nitter",
@@ -91,11 +94,6 @@
     "searxng": {
         "name": "SearXNG",
         "icon": "searxng.png",
-        "docker": true
-    },
-    "teddit": {
-        "name": "Teddit",
-        "icon": "teddit.png",
         "docker": true
     },
     "lingva": {

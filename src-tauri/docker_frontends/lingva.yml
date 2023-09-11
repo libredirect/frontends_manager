@@ -11,4 +11,4 @@ services:
       - default_source_lang=auto
       - default_target_lang=en
     ports:
-      - 10054:3000
+      - 10053:3000

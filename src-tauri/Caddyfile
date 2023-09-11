@@ -37,9 +37,6 @@ http://libremdb.localhost:8080 {
 http://searxng.localhost:8080 {
 	reverse_proxy localhost:10052
 }
-http://teddit.localhost:8080 {
-	reverse_proxy localhost:10053
-}
 http://lingva_translate.localhost:8080 {
-	reverse_proxy localhost:10054
+	reverse_proxy localhost:10053
 }

@@ -7,10 +7,9 @@ For anonymizing your IP, use [Lokinet](https://lokinet.org/)
 
 Available Frontends:
 - [LibReddit](https://github.com/spikecodes/libreddit)
-- [Teddit](https://github.com/teddit-net/teddit)
 - [Nitter](https://github.com/zedeus/nitter)
 - [Rimgo](https://codeberg.org/video-prize-ranch/rimgo)
-- [SimplyTranslate](https://git.sr.ht/~metalune/simplytranslate_web)
+- [SimplyTranslate](https://codeberg.org/SimpleWeb/SimplyTranslate)
 - [LingvaTranslate](https://github.com/TheDavidDelta/lingva-translate)
 - [AnonymousOverflow](https://github.com/httpjamesm/AnonymousOverflow)
 - [Dumb](https://github.com/rramiachraf/dumb)
