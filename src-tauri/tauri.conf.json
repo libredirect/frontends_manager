@@ -31,9 +31,7 @@
       "fs": {
         "all": true,
         "scope": [
-          "$RESOURCE/*",
-          "$APPLOCALDATA/*",
-          "$APPLOCALDATA/caddy/*"
+          "**"
         ]
       },
       "os": {
@@ -150,7 +148,6 @@
       "identifier": "org.libredirect.frontends-manager",
       "targets": [
         "deb",
-        "appimage",
         "nsis",
         "updater"
       ],
