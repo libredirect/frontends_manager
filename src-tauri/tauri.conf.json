@@ -30,9 +30,12 @@
       },
       "fs": {
         "all": true,
-        "scope": [
-          "**"
-        ]
+        "scope": {
+          "allow": [
+            "**"
+          ],
+          "requireLiteralLeadingDot": false
+        }
       },
       "os": {
         "all": true
