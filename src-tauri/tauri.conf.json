@@ -34,7 +34,7 @@
           "allow": [
             "**"
           ],
-          "requireLiteralLeadingDot": false
+          "requireLiteralLeadingDot": true
         }
       },
       "os": {
