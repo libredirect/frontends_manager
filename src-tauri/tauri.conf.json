@@ -115,8 +115,8 @@
             "args": true
           },
           {
-            "name": "docker",
-            "cmd": "docker",
+            "name": "/var/run/host/usr/local/bin/docker",
+            "cmd": "/var/run/host/usr/local/bin/docker",
             "args": true
           },
           {
