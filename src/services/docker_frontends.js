@@ -6,7 +6,11 @@ const fs = window.__TAURI__.fs;
 let frontendsProcessesDocker = []
 
 async function docker_command(name, action) {
-    return new shell.Command('/var/run/host/usr/local/bin/docker', ['compose', '-f', `${name}.yml`, action], { cwd: await path.join(await path.appLocalDataDir(), 'docker_compose') })
+    if (await fs.exists('/usr/bin/flatpak-spawn')) {
+        return new shell.Command('flatpak-spawn', ['--host', 'docker', 'compose', '-f', `${name}.yml`, action], { cwd: await path.join(await path.appLocalDataDir(), 'docker_compose') })
+    } else {
+        return new shell.Command('docker', ['compose', '-f', `${name}.yml`, action], { cwd: await path.join(await path.appLocalDataDir(), 'docker_compose') })
+    }
 }
 
 async function download_frontend(name) {
@@ -48,10 +52,19 @@ async function check_downloaded(name) {
             resolve('not_downloaded')
             return
         }
-        const cmd = new shell.Command(
-            '/var/run/host/usr/local/bin/docker', ['ps', '-a', '--format', 'json', '--filter', `name=${name}`],
-            { cwd: await path.join(await path.appLocalDataDir(), 'docker_compose') }
-        )
+        let cmd
+        if (await fs.exists('/usr/bin/flatpak-spawn')) {
+            cmd = new shell.Command(
+                'flatpak-spawn', ['--host', 'docker', 'ps', '-a', '--format', 'json', '--filter', `name=${name}`],
+                { cwd: await path.join(await path.appLocalDataDir(), 'docker_compose') }
+            )
+        } else {
+            cmd = new shell.Command(
+                'docker', ['ps', '-a', '--format', 'json', '--filter', `name=${name}`],
+                { cwd: await path.join(await path.appLocalDataDir(), 'docker_compose') }
+            )
+        }
+
         cmd.on('close', () => resolve('not_downloaded'));
         cmd.stdout.on('data', data => {
             frontendsProcessesDocker.push(name)
@@ -104,11 +117,24 @@ async function remove_frontend(name) {
 function health() {
     return new Promise(async resolve => {
         try {
-            const cmd = new shell.Command('/var/run/host/usr/local/bin/docker', ['compose', 'version'])
+            let cmd
+            if (await fs.exists('/usr/bin/flatpak-spawn')) {
+                cmd = new shell.Command('flatpak-spawn', ['--host', 'docker', 'compose', 'version'])
+            }
+            else {
+                cmd = new shell.Command('docker', ['compose', 'version'])
+            }
+
             cmd.on('error', () => resolve('not_installed'));
             cmd.stderr.on('data', () => resolve('not_installed'))
             cmd.stdout.on('data', async () => {
-                const cmd = new shell.Command('/var/run/host/usr/local/bin/docker', ['ps'])
+                let cmd
+                if (await fs.exists('/usr/bin/flatpak-spawn')) {
+                    cmd = new shell.Command('flatpak-spawn', ['--host', 'docker', 'ps'])
+                } else {
+                    cmd = new shell.Command('docker', ['ps'])
+                }
+
                 cmd.on('error', () => resolve('not_running'));
                 cmd.stdout.on('data', () => resolve('running'))
                 cmd.stderr.on('data', () => resolve('not_running'))
