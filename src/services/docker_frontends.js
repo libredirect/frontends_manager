@@ -6,7 +6,7 @@ const fs = window.__TAURI__.fs;
 let frontendsProcessesDocker = []
 
 async function docker_command(name, action) {
-    return new shell.Command('docker', ['compose', '-f', `${name}.yml`, action], { cwd: await path.join(await path.appLocalDataDir(), 'docker_compose') })
+    return new shell.Command('/var/run/host/usr/local/docker', ['compose', '-f', `${name}.yml`, action], { cwd: await path.join(await path.appLocalDataDir(), 'docker_compose') })
 }
 
 async function download_frontend(name) {
@@ -23,7 +23,10 @@ async function download_frontend(name) {
             return
         }
         const cmd = await docker_command(name, 'create')
-        cmd.on('error', error => { console.error(`command error: "${error}"`); resolve(false) });
+        cmd.on('error', error => {
+            console.error(`command error: "${error}"`);
+            resolve(false)
+        });
         cmd.on('close', data => {
             resolve('downloaded')
         });
@@ -46,7 +49,7 @@ async function check_downloaded(name) {
             return
         }
         const cmd = new shell.Command(
-            'docker', ['ps', '-a', '--format', 'json', '--filter', `name=${name}`],
+            '/var/run/host/usr/local/docker', ['ps', '-a', '--format', 'json', '--filter', `name=${name}`],
             { cwd: await path.join(await path.appLocalDataDir(), 'docker_compose') }
         )
         cmd.on('close', () => resolve('not_downloaded'));
@@ -101,11 +104,11 @@ async function remove_frontend(name) {
 function health() {
     return new Promise(async resolve => {
         try {
-            const cmd = new shell.Command('docker', ['compose', 'version'])
+            const cmd = new shell.Command('/var/run/host/usr/local/docker', ['compose', 'version'])
             cmd.on('error', () => resolve('not_installed'));
             cmd.stderr.on('data', () => resolve('not_installed'))
             cmd.stdout.on('data', async () => {
-                const cmd = new shell.Command('docker', ['ps'])
+                const cmd = new shell.Command('/var/run/host/usr/local/docker', ['ps'])
                 cmd.on('error', () => resolve('not_running'));
                 cmd.stdout.on('data', () => resolve('running'))
                 cmd.stderr.on('data', () => resolve('not_running'))
