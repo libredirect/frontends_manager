@@ -27,7 +27,8 @@ document.getElementById("settings").addEventListener("click", async () => {
 let frontends_running = {};
 (async () => {
     const platform = await window.__TAURI__.os.platform()
-    const config = JSON.parse(await fs.readTextFile(await path.resolveResource('frontends.json')))
+    let config
+    fetch("/frontends.json").then((res) => res.text()).then((text) => config = JSON.parse(text)).catch((e) => console.error(e));
     let isDockerInstalled = await docker_frontends.health()
     await binary_frontends.run_caddy()
     await binary_frontends.startup()
@@ -238,6 +239,7 @@ let frontends_running = {};
                         break;
                 }
             }
+
             if (!config[key].docker) frontends_running[key] = await binary_frontends.check_downloaded(key)
             else frontends_running[key] = await docker_frontends.check_downloaded(key)
 

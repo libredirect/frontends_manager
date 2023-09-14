@@ -6,11 +6,22 @@ const fs = window.__TAURI__.fs;
 let frontendsProcessesDocker = []
 
 async function docker_command(name, action) {
-    return new shell.Command('docker', ['compose', '-f', `${name}.yml`, action], { cwd: await path.resolveResource('docker_frontends') })
+    return new shell.Command('docker', ['compose', '-f', `${name}.yml`, action], { cwd: await path.join(await path.appLocalDataDir(), 'docker_compose') })
 }
 
 async function download_frontend(name) {
     return new Promise(async resolve => {
+        if (!(await fs.exists('docker_compose', { dir: fs.BaseDirectory.AppLocalData }))) {
+            await fs.createDir('docker_compose', { dir: fs.BaseDirectory.AppLocalData })
+            resolve('not_downloaded')
+            return
+        }
+        if (!(await fs.exists(`docker_compose/${name}.yml`, { dir: fs.BaseDirectory.AppLocalData }))) {
+            const yml = await (await fetch(`/docker_compose/${name}.yml`)).text();
+            await fs.writeTextFile(`docker_compose/${name}.yml`, yml, { dir: fs.BaseDirectory.AppLocalData })
+            resolve('not_downloaded')
+            return
+        }
         const cmd = await docker_command(name, 'create')
         cmd.on('error', error => { console.error(`command error: "${error}"`); resolve(false) });
         cmd.on('close', data => {
@@ -20,11 +31,23 @@ async function download_frontend(name) {
     })
 }
 
+
 async function check_downloaded(name) {
     return new Promise(async resolve => {
+        if (!(await fs.exists('docker_compose', { dir: fs.BaseDirectory.AppLocalData }))) {
+            await fs.createDir('docker_compose', { dir: fs.BaseDirectory.AppLocalData })
+            resolve('not_downloaded')
+            return
+        }
+        if (!(await fs.exists(`docker_compose/${name}.yml`, { dir: fs.BaseDirectory.AppLocalData }))) {
+            const yml = await (await fetch(`/docker_compose/${name}.yml`)).text();
+            await fs.writeTextFile(`docker_compose/${name}.yml`, yml, { dir: fs.BaseDirectory.AppLocalData })
+            resolve('not_downloaded')
+            return
+        }
         const cmd = new shell.Command(
             'docker', ['ps', '-a', '--format', 'json', '--filter', `name=${name}`],
-            { cwd: await path.resolveResource('docker_frontends') }
+            { cwd: await path.join(await path.appLocalDataDir(), 'docker_compose') }
         )
         cmd.on('close', () => resolve('not_downloaded'));
         cmd.stdout.on('data', data => {

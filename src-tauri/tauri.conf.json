@@ -32,9 +32,10 @@
         "all": true,
         "scope": {
           "allow": [
+            "$APPLOCALDATA/**",
             "**"
           ],
-          "requireLiteralLeadingDot": true
+          "requireLiteralLeadingDot": false
         }
       },
       "os": {
@@ -153,11 +154,6 @@
         "deb",
         "nsis",
         "updater"
-      ],
-      "resources": [
-        "frontends.json",
-        "docker_frontends",
-        "Caddyfile"
       ]
     },
     "updater": {

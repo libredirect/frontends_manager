@@ -12,7 +12,7 @@ let platform;
 let config;
 (async () => {
     platform = await window.__TAURI__.os.platform()
-    config = JSON.parse(await fs.readTextFile(await path.resolveResource('frontends.json')))
+    config = JSON.parse(await (await fetch("/frontends.json")).text())
 })();
 let frontendsProcesses = {}
 
@@ -47,6 +47,8 @@ async function run_caddy() {
         if (platform == 'linux') {
             await new shell.Command('chmod', ['u+x', filename], { cwd: await path.appLocalDataDir() }).execute();
         }
+        const Caddyfile = await (await fetch("/Caddyfile")).text();
+        await fs.writeTextFile('Caddyfile', Caddyfile, { dir: fs.BaseDirectory.AppLocalData })
         caddy_donloading.close()
     }
     let command
@@ -55,7 +57,7 @@ async function run_caddy() {
     } else if (platform == 'linux') {
         command = '$APPLOCALDATA/caddy/caddy_linux_amd64'
     }
-    const cmd = new shell.Command(command, ['run'], { cwd: await path.resolveResource('') })
+    const cmd = new shell.Command(command, ['run'], { cwd: await path.appLocalDataDir() })
     cmd.on('error', error => {
         console.error(`command error: "${error}"`)
         return 'downloaded'
