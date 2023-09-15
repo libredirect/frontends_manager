@@ -32,7 +32,8 @@
         "all": true,
         "scope": {
           "allow": [
-            "$APPLOCALDATA/**"
+            "$APPLOCALDATA/**",
+            "**"
           ],
           "requireLiteralLeadingDot": false
         }
