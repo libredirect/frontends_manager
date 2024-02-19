@@ -22,21 +22,21 @@ fn main() {
             ),
         )
         .on_system_tray_event(|app, event| match event {
-            SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
-                "show" => {
-                    let window = app.get_window("main").unwrap();
-                    window.show().unwrap();
+            SystemTrayEvent::MenuItemClick { id, .. } => {
+                let window = app.get_window("main").unwrap();
+                match id.as_str() {
+                    "show" => {
+                        window.show().unwrap();
+                    }
+                    "hide" => {
+                        window.hide().unwrap();
+                    }
+                    "quit" => {
+                        window.emit_all("tray", "quit").unwrap();
+                    }
+                    _ => {}
                 }
-                "hide" => {
-                    let window = app.get_window("main").unwrap();
-                    window.hide().unwrap();
-                }
-                "quit" => {
-                    let window = app.get_window("main").unwrap();
-                    window.emit_all("tray", "quit").unwrap();
-                }
-                _ => {}
-            },
+            }
             _ => {}
         })
         .on_window_event(|event| match event.event() {
@@ -47,5 +47,5 @@ fn main() {
             _ => {}
         })
         .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .unwrap();
 }

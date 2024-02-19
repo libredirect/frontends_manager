@@ -53,14 +53,6 @@
             "ADDRESS=127.0.0.1:10044"
         ]
     },
-    "nitter": {
-        "name": "Nitter",
-        "icon": "nitter-icon.png",
-        "command_linux": "./nitter_linux_x86_64",
-        "command_windows": "$APPLOCALDATA\\nitter\\nitter_windows_x86_64.exe",
-        "docker": true,
-        "args": []
-    },
     "dumb": {
         "name": "Dumb",
         "icon": "dumb.png",
@@ -70,35 +62,5 @@
         "env": [
             "PORT=10047"
         ]
-    },
-    "biblioreads": {
-        "name": "BiblioReads",
-        "icon": "biblioreads.png",
-        "docker": true
-    },
-    "proxitok": {
-        "name": "ProxiTok",
-        "icon": "proxitok.png",
-        "docker": true
-    },
-    "quetre": {
-        "name": "Quetre",
-        "icon": "quetre.png",
-        "docker": true
-    },
-    "libremdb": {
-        "name": "LibreMDb",
-        "icon": "libremdb.png",
-        "docker": true
-    },
-    "searxng": {
-        "name": "SearXNG",
-        "icon": "searxng.png",
-        "docker": true
-    },
-    "lingva": {
-        "name": "LingvaTranslate",
-        "icon": "lingva.png",
-        "docker": true
     }
 }

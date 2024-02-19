@@ -115,11 +115,6 @@
             "args": true
           },
           {
-            "name": "docker",
-            "cmd": "docker",
-            "args": true
-          },
-          {
             "name": "flatpak-spawn",
             "cmd": "flatpak-spawn",
             "args": true
