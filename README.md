@@ -14,7 +14,6 @@ Available Frontends:
 
 For Managing the frontends:
 - Web Server: [Caddy](https://caddyserver.com/)
-- Cache Server for some frontends: [Redis](https://redis.io/)
 - GUI: [Tauri](https://tauri.app/)
 
 ## Development

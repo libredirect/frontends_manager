@@ -3676,7 +3676,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-autostart"
 version = "0.0.0"
-source = "git+https://github.com/tauri-apps/plugins-workspace?branch=v1#4cc2e50d164e486b97043c840229be469401f438"
+source = "git+https://github.com/tauri-apps/plugins-workspace?branch=v1#58176114f98c977e3435aba3aa910b61115a394e"
 dependencies = [
  "auto-launch",
  "log",
@@ -3689,7 +3689,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-single-instance"
 version = "0.0.0"
-source = "git+https://github.com/tauri-apps/plugins-workspace?branch=v1#4cc2e50d164e486b97043c840229be469401f438"
+source = "git+https://github.com/tauri-apps/plugins-workspace?branch=v1#58176114f98c977e3435aba3aa910b61115a394e"
 dependencies = [
  "log",
  "serde",
