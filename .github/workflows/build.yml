@@ -35,8 +35,12 @@ jobs:
 
       - name: Install frontend dependencies
         run: npm install
+          
+      - name: Install dependencies (windows only)
+        if: matrix.platform == 'windows-latest'
+        run: npm install @tauri-apps/cli-win32-x64-msvc
 
-      - uses: tauri-apps/tauri-action@v0
+      - uses: tauri-apps/tauri-action@v0.4.4
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
