@@ -1,7 +1,7 @@
 name: Release
 on:
   push:
-    tags:
+   tags:
       - 'v*'
   workflow_dispatch:
 
@@ -16,25 +16,19 @@ jobs:
     runs-on: ${{ matrix.platform }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-20.04'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev librsvg2-dev
-
-      - name: Rust setup
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: './src-tauri -> target'
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
 
       - name: Sync node version and setup cache
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
           cache: 'npm'
@@ -42,8 +36,7 @@ jobs:
       - name: Install frontend dependencies
         run: npm install
 
-      - name: Build the app
-        uses: tauri-apps/tauri-action@v0
+      - uses: tauri-apps/tauri-action@v0
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
