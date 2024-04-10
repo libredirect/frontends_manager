@@ -3,6 +3,7 @@ const shell = window.__TAURI__.shell;
 const path = window.__TAURI__.path;
 const fs = window.__TAURI__.fs;
 const http = window.__TAURI__.http;
+const invoke = window.__TAURI__.invoke
 
 Object.values = function (obj) {
     return Object.keys(obj).map(key => obj[key])
@@ -30,25 +31,11 @@ async function run_caddy() {
     platform = await window.__TAURI__.os.platform()
     const result = await check_downloaded('caddy')
     if (result == 'not_downloaded') {
-        const caddy_donloading = new Twindow.WebviewWindow('refreshWindow', { url: 'message.html#Downloading Caddy', height: 200, width: 400, center: true });
-        let filename
-        let url
-        if (platform == 'linux') {
-            filename = 'caddy_linux_amd64'
-            url = 'https://caddyserver.com/api/download?os=linux&arch=amd64'
-        } else if (platform == 'win32') {
-            filename = 'caddy_windows_amd64.exe'
-            url = 'https://caddyserver.com/api/download?os=windows&arch=amd64'
-        }
-        filename = await path.join('caddy', filename)
-        const response = await http.fetch(url, { method: 'GET', responseType: http.ResponseType.Binary });
-        await fs.createDir('caddy', { dir: fs.BaseDirectory.AppLocalData, recursive: true });
-        await fs.writeBinaryFile(filename, new Uint8Array(response.data), { dir: fs.BaseDirectory.AppLocalData });
-        if (platform == 'linux') {
-            await new shell.Command('chmod', ['u+x', filename], { cwd: await path.appLocalDataDir() }).execute();
-        }
-        const Caddyfile = await (await fetch("/Caddyfile")).text();
-        await fs.writeTextFile('Caddyfile', Caddyfile, { dir: fs.BaseDirectory.AppLocalData })
+        const caddy_donloading = new Twindow.WebviewWindow('refreshWindow',
+            { url: 'message.html#Downloading Caddy', height: 200, width: 400, center: true },
+        );
+        let message = await invoke('download_caddy')
+        console.log(message)
         caddy_donloading.close()
     }
     let command
