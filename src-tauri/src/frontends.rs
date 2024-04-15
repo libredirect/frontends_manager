@@ -1,6 +1,6 @@
 use flate2::read::GzDecoder;
 
-use std::fs::File;
+use std::fs::{self, File};
 
 use std::process::{Child, Command};
 use std::{env, fs::set_permissions, io::Write, os::unix::fs::PermissionsExt, path::Path};
@@ -22,8 +22,9 @@ fn download_frontend_general(app_handle: tauri::AppHandle, frontend: String) -> 
         save_file(
             "https://github.com/libredirect/frontends_binaries/raw/main/binaries/".to_string()
                 + &filename,
-            &(&filename).into(),
+            &dir.join(&filename),
         );
+        fs::remove_file(&dir.join(&filename)).unwrap();
         let tar_gz = File::open(&filename).unwrap();
         let tar = GzDecoder::new(tar_gz);
         let mut archive = Archive::new(tar);
@@ -97,6 +98,15 @@ pub fn download_frontend(app_handle: tauri::AppHandle, frontend: &str) -> String
 pub fn run_frontend(app_handle: tauri::AppHandle, frontend: &str) -> String {
     if env::consts::OS == "linux" {
         match frontend {
+            "caddy" => {
+                return run_frontend_general(
+                    app_handle,
+                    frontend,
+                    "./caddy_linux_amd64",
+                    &["run"],
+                    &[],
+                );
+            }
             "libreddit" => {
                 return run_frontend_general(
                     app_handle,
@@ -198,6 +208,7 @@ fn run_frontend_general(
 pub fn stop_frontend(frontend: &str) -> String {
     for (key, child) in unsafe { &mut FRONTENDS_PROCESSES } {
         if key == frontend {
+            println!("{}", key);
             child.kill().unwrap();
             let index = unsafe { &FRONTENDS_PROCESSES }
                 .iter()
@@ -210,8 +221,45 @@ pub fn stop_frontend(frontend: &str) -> String {
 }
 
 #[tauri::command]
-pub fn stop_all() {
-    for (_, child) in unsafe { &mut FRONTENDS_PROCESSES } {
+pub fn stop_all(app_handle: tauri::AppHandle) {
+    let mut frontends_json: Vec<String> = vec![];
+    for (key, child) in unsafe { &mut FRONTENDS_PROCESSES } {
+        println!("{}", key);
         child.kill().unwrap();
+        frontends_json.push(key.to_string());
+    }
+    let json = serde_json::to_string(&frontends_json).unwrap();
+    let binding = app_handle.path_resolver().app_local_data_dir().unwrap();
+    let path = Path::new(binding.to_str().unwrap()).join("binary_frontends.json");
+    let mut output = File::create(path).unwrap();
+    write!(output, "{}", json).unwrap();
+}
+
+#[tauri::command]
+pub fn check_downloaded(app_handle: tauri::AppHandle, frontend: &str) -> String {
+    let binding = app_handle.path_resolver().app_local_data_dir().unwrap();
+    let dir = Path::new(binding.to_str().unwrap()).join(frontend);
+    if Path::new(&dir).exists() {
+        for (key, _) in unsafe { &FRONTENDS_PROCESSES } {
+            if key == frontend {
+                return "running".into();
+            }
+        }
+        return "downloaded".into();
+    }
+    return "not_downloaded".into();
+}
+
+#[tauri::command]
+pub fn startup(app_handle: tauri::AppHandle) {
+    let binding = app_handle.path_resolver().app_local_data_dir().unwrap();
+    let path = Path::new(binding.to_str().unwrap()).join("binary_frontends.json");
+    if Path::new(&path).exists() {
+        let contents = fs::read_to_string(path).unwrap();
+        let json: Vec<String> =
+            serde_json::from_str(&contents).expect("JSON was not well-formatted");
+        for frontend in json {
+            run_frontend(app_handle.clone(), &frontend);
+        }
     }
 }

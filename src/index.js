@@ -62,7 +62,7 @@ let frontends_running = {};
         closeElement.addEventListener("click", async () => {
             frontends_running[key] = 'closing'
             running_buttons()
-            frontends_running[key] = await binary_frontends.stop_frontend(key, true)
+            frontends_running[key] = await binary_frontends.stop_frontend(key)
             running_buttons()
         })
         downloadElement.addEventListener("click", async () => {
@@ -212,9 +212,7 @@ let frontends_running = {};
 
 
 async function quitApp() {
-    const webview = new Twindow.WebviewWindow('quitWindow', { url: 'message.html#Closing', height: 200, width: 400, center: true, title: 'Closing' });
     await binary_frontends.stop_all()
-    await webview.close()
     await process.exit(0)
 }
 

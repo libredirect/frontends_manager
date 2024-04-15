@@ -55,7 +55,9 @@ fn main() {
             download_frontend,
             run_frontend,
             stop_frontend,
-            stop_all
+            stop_all,
+            check_downloaded,
+            startup
         ])
         .run(tauri::generate_context!())
         .unwrap();
