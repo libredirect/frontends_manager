@@ -3,7 +3,7 @@
 use std::env;
 
 mod frontends;
-use frontends::download_caddy;
+use frontends::*;
 
 use tauri::{
     CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
@@ -51,7 +51,12 @@ fn main() {
             }
             _ => {}
         })
-        .invoke_handler(tauri::generate_handler![download_caddy])
+        .invoke_handler(tauri::generate_handler![
+            download_frontend,
+            run_frontend,
+            stop_frontend,
+            stop_all
+        ])
         .run(tauri::generate_context!())
         .unwrap();
 }

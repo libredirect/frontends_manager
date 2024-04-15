@@ -34,7 +34,7 @@ async function run_caddy() {
         const caddy_donloading = new Twindow.WebviewWindow('refreshWindow',
             { url: 'message.html#Downloading Caddy', height: 200, width: 400, center: true },
         );
-        let message = await invoke('download_caddy')
+        let message = await invoke('download_frontend', { frontend: 'caddy' })
         console.log(message)
         caddy_donloading.close()
     }
@@ -44,7 +44,7 @@ async function run_caddy() {
     } else if (platform == 'linux') {
         command = '$APPLOCALDATA/caddy/caddy_linux_amd64'
     }
-    const cmd = new shell.Command(command, ['run'], { cwd: await path.appLocalDataDir() })
+    const cmd = new shell.Command(command, ['run'], { cwd: await path.join(await path.appLocalDataDir(), 'caddy') })
     cmd.on('error', error => {
         console.error(`command error: "${error}"`)
         return 'downloaded'
@@ -55,48 +55,34 @@ async function run_caddy() {
 }
 
 async function run_frontend(name) {
-    let command
-    if (platform == 'win32') {
-        command = config[name].command_windows
-    } else if (platform == 'linux') {
-        command = config[name].command_linux
-    }
-    const cmd = new shell.Command(command, config[name].args, { cwd: await path.join(await path.appLocalDataDir(), name), env: formatEnv(config[name].env) })
-    console.log(cmd)
-    cmd.on('error', error => {
-        console.error(`command error: "${error}"`)
-        return 'downloaded'
-    });
-    const child = await cmd.spawn();
-    frontendsProcesses[name] = child
-    return 'running'
+    return await invoke('run_frontend', { frontend: name });
+
+    // let command
+    // if (platform == 'win32') {
+    //     command = config[name].command_windows
+    // } else if (platform == 'linux') {
+    //     command = config[name].command_linux
+    // }
+    // const cmd = new shell.Command(
+    //     command,
+    //     config[name].args,
+    //     {
+    //         cwd: await path.join(await path.appLocalDataDir(), name),
+    //         env: formatEnv(config[name].env)
+    //     }
+    // )
+    // console.log(cmd)
+    // cmd.on('error', error => {
+    //     console.error(`command error: "${error}"`)
+    //     return 'downloaded'
+    // });
+    // const child = await cmd.spaw n();
+    // frontendsProcesses[name] = child
+    // return 'running'
 }
 
-function download_frontend(name) {
-    return new Promise(async resolve => {
-        let filename
-        if (platform == 'linux') {
-            filename = `${name}_linux_x86_64.tar.gz`
-        } else if (platform == 'win32') {
-            filename = `${name}_windows_x86_64.zip`
-        }
-        const response = await http.fetch(
-            `https://github.com/libredirect/frontends_binaries/raw/main/binaries/${filename}`,
-            { method: 'GET', responseType: http.ResponseType.Binary }
-        );
-        await fs.writeBinaryFile(filename, new Uint8Array(response.data), { dir: fs.BaseDirectory.AppLocalData });
-        let extract_cmd
-        if (platform == 'linux') {
-            extract_cmd = new shell.Command('tar', ['-xzf', filename], { cwd: await path.appLocalDataDir() })
-        } else if (platform == 'win32') {
-            extract_cmd = new shell.Command('tar', ['-xf', filename], { cwd: await path.appLocalDataDir() })
-        }
-        extract_cmd.on('close', async () => {
-            await fs.removeFile(filename, { dir: fs.BaseDirectory.AppLocalData })
-            resolve('downloaded')
-        });
-        await extract_cmd.spawn();
-    })
+async function download_frontend(name) {
+    return await invoke('download_frontend', { frontend: name })
 }
 
 async function check_downloaded(name) {
@@ -105,9 +91,8 @@ async function check_downloaded(name) {
             return "running"
         }
         return 'downloaded'
-    } else {
-        return 'not_downloaded'
     }
+    return 'not_downloaded'
 }
 async function remove_frontend(name) {
     await fs.removeDir(name, { dir: fs.BaseDirectory.AppLocalData, recursive: true })
@@ -115,20 +100,11 @@ async function remove_frontend(name) {
 }
 
 async function stop_frontend(name, remove) {
-    const result = await frontendsProcesses[name].kill();
-    if (remove) delete frontendsProcesses[name]
-    if (result == null) return 'downloaded'
-    else return 'running'
+    return await invoke('stop_frontend', { frontend: name })
 }
 
 async function stop_all() {
-    const keys = Object.keys(frontendsProcesses)
-    const i = keys.indexOf("caddy"); if (i > -1) keys.splice(i, 1);
-
-    await fs.writeTextFile("binary_frontends.json", JSON.stringify(keys), { dir: fs.BaseDirectory.AppLocalData })
-    for (const name of Object.keys(frontendsProcesses)) {
-        await stop_frontend(name, false)
-    }
+    return await invoke('stop_all')
 }
 
 async function startup() {

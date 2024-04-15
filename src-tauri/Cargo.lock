@@ -1902,9 +1902,11 @@ dependencies = [
 name = "libredirect_frontends_manager"
 version = "0.1.0"
 dependencies = [
+ "flate2",
  "serde",
  "serde_json",
  "signal-hook",
+ "tar",
  "tauri",
  "tauri-build",
  "tauri-plugin-autostart",

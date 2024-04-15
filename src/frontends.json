@@ -3,64 +3,29 @@
         "name": "LibReddit",
         "icon": "libreddit-icon.png",
         "command_linux": "./libreddit_linux_x86_64",
-        "command_windows": "$APPLOCALDATA\\libreddit\\libreddit_windows_x86_64.exe",
-        "args": [
-            "-p",
-            "10041"
-        ],
-        "env": [
-            "LIBREDDIT_DEFAULT_USE_HLS=on"
-        ]
+        "command_windows": "$APPLOCALDATA\\libreddit\\libreddit_windows_x86_64.exe"
     },
     "rimgo": {
         "name": "Rimgo",
         "icon": "rimgo-icon.png",
-        "command_linux": "./rimgo_linux_x86_64",
-        "command_windows": "$APPLOCALDATA\\rimgo\\rimgo_windows_x86_64.exe",
-        "args": [],
-        "env": [
-            "ADDRESS=127.0.0.1",
-            "PORT=10042",
-            "FIBER_PREFORK=false",
-            "IMGUR_CLIENT_ID=546c25a59c58ad7",
-            "PRIVACY_CLOUDFLARE=false",
-            "PRIVACY_NOT_COLLECTED=false",
-            "PRIVACY_IP=false",
-            "PRIVACY_URL=false",
-            "PRIVACY_DEVICE=false",
-            "PRIVACY_DIAGNOSTICS=false"
-        ]
+        "command_linux": "./rimgo",
+        "command_windows": "$APPLOCALDATA\\rimgo\\rimgo.exe"
     },
     "anonymousoverflow": {
         "name": "AnonymousOverflow",
         "icon": "anonymousoverflow-icon.png",
         "command_linux": "./anonymousoverflow_linux_x86_64",
-        "command_windows": "$APPLOCALDATA\\anonymousoverflow\\anonymousoverflow_windows_x86_64.exe",
-        "args": [],
-        "env": [
-            "APP_URL=http://anonymousoverflow.localhost:8080",
-            "JWT_SIGNING_SECRET=secret",
-            "PORT=10046",
-            "HOST=127.0.0.1"
-        ]
+        "command_windows": "$APPLOCALDATA\\anonymousoverflow\\anonymousoverflow_windows_x86_64.exe"
     },
     "simplytranslate": {
         "name": "SimplyTranslate",
         "icon": "simplytranslate-icon.png",
-        "command_linux": "./simplytranslate_linux_x86_64",
-        "args": [],
-        "env": [
-            "ADDRESS=127.0.0.1:10044"
-        ]
+        "command_linux": "./simplytranslate_linux_x86_64"
     },
     "dumb": {
         "name": "Dumb",
         "icon": "dumb.png",
         "command_linux": "./dumb_linux_x86_64",
-        "command_windows": "$APPLOCALDATA\\dumb\\dumb_windows_x86_64.exe",
-        "args": [],
-        "env": [
-            "PORT=10047"
-        ]
+        "command_windows": "$APPLOCALDATA\\dumb\\dumb_windows_x86_64.exe"
     }
 }
