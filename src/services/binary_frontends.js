@@ -1,5 +1,4 @@
 const Twindow = window.__TAURI__.window
-const fs = window.__TAURI__.fs;
 const invoke = window.__TAURI__.invoke
 
 async function run_caddy() {
@@ -27,8 +26,7 @@ async function check_downloaded(name) {
 }
 
 async function remove_frontend(name) {
-    await fs.removeDir(name, { dir: fs.BaseDirectory.AppLocalData, recursive: true })
-    return 'not_downloaded'
+    return await invoke('remove_frontend', { frontend: name })
 }
 
 async function stop_frontend(name) {

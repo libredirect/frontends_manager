@@ -53,6 +53,7 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             download_frontend,
+            remove_frontend,
             run_frontend,
             stop_frontend,
             stop_all,

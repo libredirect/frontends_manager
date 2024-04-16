@@ -1,6 +1,6 @@
 use flate2::read::GzDecoder;
 
-use std::fs::{self, File};
+use std::fs::{self, remove_dir, remove_dir_all, File};
 
 use std::process::{Child, Command};
 use std::{env, fs::set_permissions, io::Write, os::unix::fs::PermissionsExt, path::Path};
@@ -262,4 +262,11 @@ pub async fn startup(app_handle: tauri::AppHandle) {
             run_frontend(app_handle.clone(), &frontend).await.unwrap();
         }
     }
+}
+
+#[tauri::command]
+pub async fn remove_frontend(app_handle: tauri::AppHandle, frontend: &str) {
+    let binding = app_handle.path_resolver().app_local_data_dir().unwrap();
+    let path = Path::new(binding.to_str().unwrap()).join(frontend);
+    remove_dir_all(path).unwrap();
 }
