@@ -1,7 +1,7 @@
 http://localhost:8080 {
 	reverse_proxy localhost:10040
 }
-http://libreddit.localhost:8080 {
+http://redlib.localhost:8080 {
 	reverse_proxy localhost:10041
 }
 http://rimgo.localhost:8080 {

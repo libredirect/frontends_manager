@@ -46,6 +46,9 @@
       },
       "path": {
         "all": true
+      },
+      "shell": {
+        "all": true
       }
     },
     "bundle": {

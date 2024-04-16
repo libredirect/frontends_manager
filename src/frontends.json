@@ -1,6 +1,6 @@
 {
-    "libreddit": {
-        "name": "LibReddit",
+    "redlib": {
+        "name": "Redlib",
         "icon": "libreddit-icon.png"
     },
     "rimgo": {

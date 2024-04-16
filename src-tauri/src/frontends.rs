@@ -1,6 +1,6 @@
 use flate2::read::GzDecoder;
 
-use std::fs::{self, remove_dir, remove_dir_all, File};
+use std::fs::{self, remove_dir_all, File};
 
 use std::process::{Child, Command};
 use std::{env, fs::set_permissions, io::Write, os::unix::fs::PermissionsExt, path::Path};
@@ -24,11 +24,11 @@ fn download_frontend_general(app_handle: tauri::AppHandle, frontend: String) -> 
                 + &filename,
             &dir.join(&filename),
         );
-        fs::remove_file(&dir.join(&filename)).unwrap();
-        let tar_gz = File::open(&filename).unwrap();
+        let tar_gz = File::open(&dir.join(&filename)).unwrap();
         let tar = GzDecoder::new(tar_gz);
         let mut archive = Archive::new(tar);
         archive.unpack(dir).unwrap();
+        fs::remove_file(&dir.join(&filename)).unwrap();
         return "downloaded".into();
     } else if env::consts::OS == "windows" {
         // let filename = frontend + "_windows_x86_64.zip";
@@ -137,11 +137,11 @@ pub async fn run_frontend(app_handle: tauri::AppHandle, frontend: &str) -> Resul
                     &[],
                 ));
             }
-            "libreddit" => {
+            "redlib" => {
                 return Ok(run_frontend_general(
                     app_handle,
                     frontend,
-                    "./libreddit_linux_x86_64",
+                    "./redlib_linux_x86_64",
                     &["-p", "10041"],
                     &[("REDLIB_DEFAULT_USE_HLS", "on")],
                 ))
@@ -265,8 +265,9 @@ pub async fn startup(app_handle: tauri::AppHandle) {
 }
 
 #[tauri::command]
-pub async fn remove_frontend(app_handle: tauri::AppHandle, frontend: &str) {
+pub async fn remove_frontend(app_handle: tauri::AppHandle, frontend: &str) -> Result<(), ()> {
     let binding = app_handle.path_resolver().app_local_data_dir().unwrap();
     let path = Path::new(binding.to_str().unwrap()).join(frontend);
     remove_dir_all(path).unwrap();
+    Ok(())
 }

@@ -6,7 +6,7 @@ Host frontends locally on your computer rather than relying on 3rd party instanc
 For anonymizing your IP, use [Lokinet](https://lokinet.org/)
 
 Available Frontends:
-- [LibReddit](https://github.com/spikecodes/libreddit)
+- [Redlib](https://github.com/redlib-org/redlib/)
 - [Rimgo](https://codeberg.org/video-prize-ranch/rimgo)
 - [SimplyTranslate](https://codeberg.org/SimpleWeb/SimplyTranslate)
 - [AnonymousOverflow](https://github.com/httpjamesm/AnonymousOverflow)
