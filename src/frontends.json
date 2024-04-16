@@ -1,31 +1,22 @@
 {
     "libreddit": {
         "name": "LibReddit",
-        "icon": "libreddit-icon.png",
-        "command_linux": "./libreddit_linux_x86_64",
-        "command_windows": "$APPLOCALDATA\\libreddit\\libreddit_windows_x86_64.exe"
+        "icon": "libreddit-icon.png"
     },
     "rimgo": {
         "name": "Rimgo",
-        "icon": "rimgo-icon.png",
-        "command_linux": "./rimgo",
-        "command_windows": "$APPLOCALDATA\\rimgo\\rimgo.exe"
+        "icon": "rimgo-icon.png"
     },
     "anonymousoverflow": {
         "name": "AnonymousOverflow",
-        "icon": "anonymousoverflow-icon.png",
-        "command_linux": "./anonymousoverflow_linux_x86_64",
-        "command_windows": "$APPLOCALDATA\\anonymousoverflow\\anonymousoverflow_windows_x86_64.exe"
+        "icon": "anonymousoverflow-icon.png"
     },
     "simplytranslate": {
         "name": "SimplyTranslate",
-        "icon": "simplytranslate-icon.png",
-        "command_linux": "./simplytranslate_linux_x86_64"
+        "icon": "simplytranslate-icon.png"
     },
     "dumb": {
         "name": "Dumb",
-        "icon": "dumb.png",
-        "command_linux": "./dumb_linux_x86_64",
-        "command_windows": "$APPLOCALDATA\\dumb\\dumb_windows_x86_64.exe"
+        "icon": "dumb.png"
     }
 }

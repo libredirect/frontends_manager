@@ -1,10 +1,7 @@
 import binary_frontends from './services/binary_frontends.js'
 import icons from './services/icons.js'
-import { enable, isEnabled, disable } from "./services/tauri-plugin-autostart-api.js";
 
-const Twindow = window.__TAURI__.window
-const path = window.__TAURI__.path;
-const fs = window.__TAURI__.fs;
+const Twindow = window.__TAURI__.window;
 const process = window.__TAURI__.process;
 const event = window.__TAURI__.event;
 
@@ -25,13 +22,11 @@ document.getElementById("settings").addEventListener("click", async () => {
 
 let frontends_running = {};
 (async () => {
-    const platform = await window.__TAURI__.os.platform()
     let config
     fetch("/frontends.json").then((res) => res.text()).then((text) => config = JSON.parse(text)).catch((e) => console.error(e));
     await binary_frontends.run_caddy()
     await binary_frontends.startup()
     for (const key in config) {
-        if ((platform == 'linux' && !config[key].command_linux) || (platform == 'win32' && !config[key].command_windows)) continue
         const tile = document.createElement('div')
         tile.classList.add('tile')
         tile.innerHTML = `

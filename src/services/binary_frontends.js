@@ -2,7 +2,6 @@ const Twindow = window.__TAURI__.window
 const fs = window.__TAURI__.fs;
 const invoke = window.__TAURI__.invoke
 
-
 async function run_caddy() {
     let result = await check_downloaded('caddy')
     if (result == 'not_downloaded') {
