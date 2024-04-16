@@ -22,8 +22,9 @@ document.getElementById("settings").addEventListener("click", async () => {
 
 let frontends_running = {};
 (async () => {
-    let config
-    fetch("/frontends.json").then((res) => res.text()).then((text) => config = JSON.parse(text)).catch((e) => console.error(e));
+    const res = await fetch("/frontends.json")
+    const text = await res.text()
+    let config = JSON.parse(text)
     await binary_frontends.run_caddy()
     await binary_frontends.startup()
     for (const key in config) {
@@ -212,12 +213,7 @@ async function quitApp() {
 }
 
 async function refreshApp() {
-    const webview = new Twindow.WebviewWindow(
-        'refreshWindow',
-        { url: 'message.html#Refreshing', height: 200, width: 400, center: true, title: 'Refreshing' }
-    );
     await binary_frontends.stop_all()
-    await webview.close()
     window.location.reload()
 }
 

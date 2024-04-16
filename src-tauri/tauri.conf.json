@@ -16,35 +16,12 @@
       "dialog": {
         "all": true
       },
-      "http": {
-        "all": true,
-        "scope": [
-          "https://github.com/libredirect/frontends_binaries/raw/main/*",
-          "https://caddyserver.com/api/*"
-        ]
-      },
       "process": {
         "all": false,
         "exit": true,
         "relaunch": true
       },
-      "fs": {
-        "all": true,
-        "scope": {
-          "allow": [
-            "$APPLOCALDATA/**",
-            "**"
-          ],
-          "requireLiteralLeadingDot": false
-        }
-      },
-      "os": {
-        "all": true
-      },
       "window": {
-        "all": true
-      },
-      "path": {
         "all": true
       },
       "shell": {

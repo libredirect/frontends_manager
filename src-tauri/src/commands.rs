@@ -7,10 +7,8 @@ use std::{env, fs::set_permissions, io::Write, os::unix::fs::PermissionsExt, pat
 use tar::Archive;
 
 fn save_file(url: String, file_name: &std::path::PathBuf) {
-    println!("{}", url);
     let mut body = ureq::get(&url).call().unwrap().into_reader();
     let mut file = std::fs::File::create(file_name).unwrap();
-    println!("{}", file_name.display());
     std::io::copy(&mut body, &mut file).unwrap();
 }
 
@@ -208,7 +206,6 @@ pub async fn run_frontend(app_handle: tauri::AppHandle, frontend: &str) -> Resul
 pub async fn stop_frontend(frontend: &str) -> Result<String, ()> {
     for (key, child) in unsafe { &mut FRONTENDS_PROCESSES } {
         if key == frontend {
-            println!("{}", key);
             child.kill().unwrap();
             let index = unsafe { &FRONTENDS_PROCESSES }
                 .iter()
@@ -224,11 +221,11 @@ pub async fn stop_frontend(frontend: &str) -> Result<String, ()> {
 pub async fn stop_all(app_handle: tauri::AppHandle) {
     let mut frontends_json: Vec<String> = vec![];
     for (key, child) in unsafe { &mut FRONTENDS_PROCESSES } {
-        println!("{}", key);
         child.kill().unwrap();
-        frontends_json.push(key.to_string());
+        if !frontends_json.contains(key) {
+            frontends_json.push(key.to_string());
+        }
     }
-    frontends_json.dedup();
     let json = serde_json::to_string(&frontends_json).unwrap();
     let binding = app_handle.path_resolver().app_local_data_dir().unwrap();
     let path = Path::new(binding.to_str().unwrap()).join("binary_frontends.json");
