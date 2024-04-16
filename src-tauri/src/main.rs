@@ -2,8 +2,8 @@
 
 use std::env;
 
-mod frontends;
-use frontends::*;
+mod commands;
+use commands::*;
 
 use tauri::{
     CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,

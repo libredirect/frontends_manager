@@ -228,6 +228,7 @@ pub async fn stop_all(app_handle: tauri::AppHandle) {
         child.kill().unwrap();
         frontends_json.push(key.to_string());
     }
+    frontends_json.dedup();
     let json = serde_json::to_string(&frontends_json).unwrap();
     let binding = app_handle.path_resolver().app_local_data_dir().unwrap();
     let path = Path::new(binding.to_str().unwrap()).join("binary_frontends.json");
@@ -256,8 +257,7 @@ pub async fn startup(app_handle: tauri::AppHandle) {
     let path = Path::new(binding.to_str().unwrap()).join("binary_frontends.json");
     if Path::new(&path).exists() {
         let contents = fs::read_to_string(path).unwrap();
-        let json: Vec<String> =
-            serde_json::from_str(&contents).expect("JSON was not well-formatted");
+        let json: Vec<String> = serde_json::from_str(&contents).unwrap();
         for frontend in json {
             run_frontend(app_handle.clone(), &frontend).await.unwrap();
         }
