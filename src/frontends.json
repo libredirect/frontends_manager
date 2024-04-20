@@ -26,5 +26,9 @@
     "neuters": {
         "name": "Neuters",
         "icon": "reuters-icon.svg"
+    },
+    "libmedium": {
+        "name": "LibMedium",
+        "icon": "medium-icon.svg"
     }
 }

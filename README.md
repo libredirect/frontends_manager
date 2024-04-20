@@ -13,6 +13,12 @@ Available Frontends:
 - [Dumb](https://github.com/rramiachraf/dumb)
 - [GotHub](https://codeberg.org/gothub/gothub)
 - [Neuters](https://github.com/HookedBehemoth/neuters)
+- [LibMedium](https://github.com/realaravinth/libmedium)
+
+<!--
+- [BreezeWiki](https://breezewiki.com)
+- [Scribe](https://sr.ht/~edwardloveall/Scribe/)
+ -->
 
 For Managing the frontends:
 - Web Server: [Caddy](https://caddyserver.com/)

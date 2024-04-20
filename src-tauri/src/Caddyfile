@@ -28,3 +28,6 @@ http://gothub.localhost:8080 {
 http://neuters.localhost:8080 {
 	reverse_proxy localhost:10049
 }
+http://libmedium.localhost:8080 {
+	reverse_proxy localhost:10050
+}

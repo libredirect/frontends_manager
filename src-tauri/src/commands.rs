@@ -261,7 +261,8 @@ pub async fn run_frontend(app_handle: tauri::AppHandle, frontend: &str) -> Resul
                         ("GOTHUB_PORT", "10048"),
                     ],
                 ))
-            } "neuters" => {
+            }
+            "neuters" => {
                 return Ok(run_frontend_general(
                     app_handle,
                     frontend,
@@ -272,6 +273,19 @@ pub async fn run_frontend(app_handle: tauri::AppHandle, frontend: &str) -> Resul
                     },
                     &["--address", "127.0.0.1:10049"],
                     &[],
+                ))
+            }
+            "libmedium" => {
+                return Ok(run_frontend_general(
+                    app_handle,
+                    frontend,
+                    if env::consts::OS == "linux" {
+                        "./libmedium_linux_x86_64"
+                    } else {
+                        "\\.libmedium_windows_x86_64.exe"
+                    },
+                    &[],
+                    &[("LIBMEDIUM", "config.toml")],
                 ))
             }
             _ => {}
