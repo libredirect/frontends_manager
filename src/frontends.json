@@ -18,5 +18,9 @@
     "dumb": {
         "name": "Dumb",
         "icon": "dumb.png"
+    },
+    "gothub": {
+        "name": "GotHub",
+        "icon": "github-icon-light.svg"
     }
 }

@@ -9,7 +9,7 @@ On a fresh install, you would have **all** instances selected. Then we made it a
 - A type where he selects all instances and doesn't care much.
 - A type where he only uses instances he trust, or he may host them on his own.
 
-## flaws with using an instance
+## Flaws with using an instance
 - The instance knows my IP address.
 - You can't trust if the instance ownerr is not logging what videos you're watching from your IP: this doesn't need any tracking scripts.
 
@@ -20,7 +20,7 @@ Let's say you will use the Tor Browser or a VPN to spoof your IP, but...
 Also:
 - Instances just die every now and then. You're forced to migrate to another instance with all your settings every now and then.
 
-## flaws with using multiple instances
+## Flaws with using multiple instances
 - How will you manage your custom settings across all of them? Unify Settings? the worst idea we've implemented technically, let alone trying to Unify accounts.
 
 Unify will also fingerprint you across multiple instances.

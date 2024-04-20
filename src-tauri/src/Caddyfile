@@ -22,21 +22,6 @@ http://anonymousoverflow.localhost:8080 {
 http://dumb.localhost:8080 {
 	reverse_proxy localhost:10047
 }
-http://biblioreads.localhost:8080 {
+http://gothub.localhost:8080 {
 	reverse_proxy localhost:10048
-}
-http://proxitok.localhost:8080 {
-	reverse_proxy localhost:10049
-}
-http://quetre.localhost:8080 {
-	reverse_proxy localhost:10050
-}
-http://libremdb.localhost:8080 {
-	reverse_proxy localhost:10051
-}
-http://searxng.localhost:8080 {
-	reverse_proxy localhost:10052
-}
-http://lingva_translate.localhost:8080 {
-	reverse_proxy localhost:10053
 }

@@ -20,6 +20,7 @@ tauri-plugin-autostart = { git = "https://github.com/tauri-apps/plugins-workspac
 ureq = "2.9.6"
 tar = "0.4.40"
 flate2 = "1.0.28"
+zip_next = "1.1.0"
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]

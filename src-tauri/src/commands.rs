@@ -1,4 +1,5 @@
 use flate2::read::GzDecoder;
+use zip_next::ZipArchive;
 
 use std::fs::{self, remove_dir_all, File};
 
@@ -17,19 +18,30 @@ fn download_frontend_general(app_handle: tauri::AppHandle, frontend: String) -> 
     let dir = Path::new(binding.to_str().unwrap());
     if env::consts::OS == "linux" {
         let filename = frontend + "_linux_x86_64.tar.gz";
+        let filename_path = dir.join(&filename);
         save_file(
             "https://github.com/libredirect/frontends_binaries/raw/main/binaries/".to_string()
                 + &filename,
-            &dir.join(&filename),
+            &filename_path,
         );
-        let tar_gz = File::open(&dir.join(&filename)).unwrap();
-        let tar = GzDecoder::new(tar_gz);
+        let tar = GzDecoder::new(File::open(&filename_path).unwrap());
         let mut archive = Archive::new(tar);
         archive.unpack(dir).unwrap();
-        fs::remove_file(&dir.join(&filename)).unwrap();
+        fs::remove_file(&filename_path).unwrap();
         return "downloaded".into();
     } else if env::consts::OS == "windows" {
-        // let filename = frontend + "_windows_x86_64.zip";
+        let filename = frontend + "_windows_x86_64.zip";
+        let filename_path = dir.join(&filename);
+        save_file(
+            "https://github.com/libredirect/frontends_binaries/raw/main/binaries/".to_string()
+                + &filename,
+            &filename_path,
+        );
+        let zip = fs::File::open(&filename_path).unwrap();
+        let mut archive = ZipArchive::new(zip).unwrap();
+        archive.extract(dir).unwrap();
+        fs::remove_file(&filename_path).unwrap();
+        return "downloaded".into();
     }
     "not_downloaded".into()
 }
@@ -41,28 +53,33 @@ fn run_frontend_general(
     args: &[&str],
     envs: &[(&str, &str)],
 ) -> String {
-    if env::consts::OS == "linux" {
-        let binding = app_handle.path_resolver().app_local_data_dir().unwrap();
-        let mut output = Command::new(command);
-        output.current_dir(Path::new(binding.to_str().unwrap()).join(&frontend));
-        if !args.is_empty() {
-            output.args(args);
-        }
-        if !envs.is_empty() {
-            output.envs(envs.to_vec());
-        }
-        let child = output
-            .spawn()
-            .expect(&(frontend.to_string() + " failed to start"));
-
-        unsafe { FRONTENDS_PROCESSES.push((frontend.to_string(), child)) };
-
-        return "running".into();
+    let binding = app_handle.path_resolver().app_local_data_dir().unwrap();
+    let mut output = Command::new(command);
+    output.current_dir(Path::new(binding.to_str().unwrap()).join(&frontend));
+    if !args.is_empty() {
+        output.args(args);
     }
-    "downloaded".into()
+    if !envs.is_empty() {
+        output.envs(envs.to_vec());
+    }
+    let child = output.spawn();
+    if !child.is_ok() {
+        return "downloaded".into();
+    }
+    unsafe { FRONTENDS_PROCESSES.push((frontend.to_string(), child.unwrap())) };
+    "running".into()
 }
 
 static mut FRONTENDS_PROCESSES: Vec<(String, Child)> = vec![];
+
+fn write_caddyfile(app_handle: &tauri::AppHandle) {
+    let binding = app_handle.path_resolver().app_local_data_dir().unwrap();
+    let caddy_dir = Path::new(binding.to_str().unwrap()).join("caddy");
+    let mut caddyfile = std::fs::File::create(caddy_dir.join("Caddyfile")).unwrap();
+    caddyfile
+        .write_all(include_str!("Caddyfile").as_bytes())
+        .unwrap();
+}
 
 #[tauri::command]
 pub async fn download_frontend(app_handle: tauri::AppHandle, frontend: &str) -> Result<String, ()> {
@@ -86,10 +103,7 @@ pub async fn download_frontend(app_handle: tauri::AppHandle, frontend: &str) -> 
                     &caddy_dir.join("caddy_windows_amd64.exe"),
                 );
             }
-            let mut caddyfile = std::fs::File::create(caddy_dir.join("Caddyfile")).unwrap();
-            caddyfile
-                .write_all(include_str!("Caddyfile").as_bytes())
-                .unwrap();
+            write_caddyfile(&app_handle);
             Ok("downloaded".into())
         }
         "rimgo" => {
@@ -103,17 +117,20 @@ pub async fn download_frontend(app_handle: tauri::AppHandle, frontend: &str) -> 
                         .to_string(),
                     &filename,
                 );
-                let tar_gz = File::open(&filename).unwrap();
-                let tar = GzDecoder::new(tar_gz);
+                let tar = GzDecoder::new(File::open(&filename).unwrap());
                 let mut archive = Archive::new(tar);
                 archive.unpack(dir).unwrap();
                 return Ok("downloaded".into());
             } else if env::consts::OS == "windows" {
+                let filename = dir.join("rimgo-windows-amd64.zip");
                 save_file(
                     "https://codeberg.org/rimgo/rimgo/releases/download/latest/rimgo-windows-amd64.zip"
                         .to_string(),
-                    &dir.join("rimgo-windows-amd64.zip"),
+                    &filename,
                 );
+                let zipfile = fs::File::open(&filename).unwrap();
+                let mut archive = zip_next::ZipArchive::new(zipfile).unwrap();
+                archive.extract(dir).unwrap();
                 return Ok("downloaded".into());
             }
             Ok("not_downloaded".into())
@@ -124,13 +141,18 @@ pub async fn download_frontend(app_handle: tauri::AppHandle, frontend: &str) -> 
 
 #[tauri::command]
 pub async fn run_frontend(app_handle: tauri::AppHandle, frontend: &str) -> Result<String, ()> {
-    if env::consts::OS == "linux" {
+    if env::consts::OS == "linux" || env::consts::OS == "windows" {
         match frontend {
             "caddy" => {
+                write_caddyfile(&app_handle);
                 return Ok(run_frontend_general(
                     app_handle,
                     frontend,
-                    "./caddy_linux_amd64",
+                    if env::consts::OS == "linux" {
+                        "./caddy_linux_amd64"
+                    } else {
+                        "\\.caddy_windows_amd64.exe"
+                    },
                     &["run"],
                     &[],
                 ));
@@ -139,7 +161,11 @@ pub async fn run_frontend(app_handle: tauri::AppHandle, frontend: &str) -> Resul
                 return Ok(run_frontend_general(
                     app_handle,
                     frontend,
-                    "./redlib_linux_x86_64",
+                    if env::consts::OS == "linux" {
+                        "./redlib_linux_x86_64"
+                    } else {
+                        "\\.redlib_windows_x86_64.exe"
+                    },
                     &["-p", "10041"],
                     &[("REDLIB_DEFAULT_USE_HLS", "on")],
                 ))
@@ -148,7 +174,11 @@ pub async fn run_frontend(app_handle: tauri::AppHandle, frontend: &str) -> Resul
                 return Ok(run_frontend_general(
                     app_handle,
                     frontend,
-                    "./rimgo",
+                    if env::consts::OS == "linux" {
+                        "./rimgo"
+                    } else {
+                        "\\.rimgo.exe"
+                    },
                     &[],
                     &[
                         ("ADDRESS", "127.0.0.1"),
@@ -168,7 +198,11 @@ pub async fn run_frontend(app_handle: tauri::AppHandle, frontend: &str) -> Resul
                 return Ok(run_frontend_general(
                     app_handle,
                     frontend,
-                    "./anonymousoverflow_linux_x86_64",
+                    if env::consts::OS == "linux" {
+                        "./anonymousoverflow_linux_x86_64"
+                    } else {
+                        "\\.anonymousoverflow_windows_x86_64.exe"
+                    },
                     &[],
                     &[
                         ("APP_URL", "http://anonymousoverflow.localhost:8080"),
@@ -182,7 +216,11 @@ pub async fn run_frontend(app_handle: tauri::AppHandle, frontend: &str) -> Resul
                 return Ok(run_frontend_general(
                     app_handle,
                     frontend,
-                    "./simplytranslate_linux_x86_64",
+                    if env::consts::OS == "linux" {
+                        "./simplytranslate_linux_x86_64"
+                    } else {
+                        "\\.simplytranslate_windows_x86_64.exe"
+                    },
                     &[],
                     &[("ADDRESS", "127.0.0.1:10044")],
                 ))
@@ -191,15 +229,44 @@ pub async fn run_frontend(app_handle: tauri::AppHandle, frontend: &str) -> Resul
                 return Ok(run_frontend_general(
                     app_handle,
                     frontend,
-                    "./dumb_linux_x86_64",
+                    if env::consts::OS == "linux" {
+                        "./dumb_linux_x86_64"
+                    } else {
+                        "\\.dumb_windows_x86_64.exe"
+                    },
                     &[],
                     &[("PORT", "10047")],
                 ))
             }
+            "gothub" => {
+                return Ok(run_frontend_general(
+                    app_handle,
+                    frontend,
+                    if env::consts::OS == "linux" {
+                        "./gothub_linux_x86_64"
+                    } else {
+                        "\\.gothub_windows_x86_64.exe"
+                    },
+                    &["serve"],
+                    &[
+                        ("GOTHUB_SETUP_COMPLETE", "true"),
+                        ("GOTHUB_IP_LOGGED", "false"),
+                        ("GOTHUB_REQUEST_URL_LOGGED", "false"),
+                        ("GOTHUB_USER_AGENT_LOGGED", "false"),
+                        ("GOTHUB_DIAGNOSTIC_INFO_LOGGED", "false"),
+                        ("GOTHUB_INSTANCE_PRIVACY_POLICY", ""),
+                        ("GOTHUB_INSTANCE_COUNTRY", ""),
+                        ("GOTHUB_INSTANCE_PROVIDER", ""),
+                        ("GOTHUB_INSTANCE_CLOUDFLARE", "false"),
+                        ("GOTHUB_PORT", "10048"),
+                    ],
+                ))
+            }
             _ => {}
         }
+        return Ok("downloaded".into());
     }
-    Ok("downloaded".into())
+    Ok("not_downloaded".into())
 }
 
 #[tauri::command]

@@ -11,6 +11,7 @@ Available Frontends:
 - [SimplyTranslate](https://codeberg.org/SimpleWeb/SimplyTranslate)
 - [AnonymousOverflow](https://github.com/httpjamesm/AnonymousOverflow)
 - [Dumb](https://github.com/rramiachraf/dumb)
+- [GotHub](https://codeberg.org/gothub/gothub)
 
 For Managing the frontends:
 - Web Server: [Caddy](https://caddyserver.com/)

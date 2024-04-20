@@ -30,15 +30,9 @@ fn main() {
             SystemTrayEvent::MenuItemClick { id, .. } => {
                 let window = app.get_window("main").unwrap();
                 match id.as_str() {
-                    "show" => {
-                        window.show().unwrap();
-                    }
-                    "hide" => {
-                        window.hide().unwrap();
-                    }
-                    "quit" => {
-                        window.emit_all("tray", "quit").unwrap();
-                    }
+                    "show" => window.show().unwrap(),
+                    "hide" => window.hide().unwrap(),
+                    "quit" => window.emit_all("tray", "quit").unwrap(),
                     _ => {}
                 }
             }
