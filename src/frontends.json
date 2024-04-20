@@ -22,5 +22,9 @@
     "gothub": {
         "name": "GotHub",
         "icon": "github-icon-light.svg"
+    },
+    "neuters": {
+        "name": "Neuters",
+        "icon": "reuters-icon.svg"
     }
 }
