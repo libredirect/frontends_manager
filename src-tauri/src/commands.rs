@@ -355,9 +355,9 @@ pub async fn startup(app_handle: tauri::AppHandle) {
 }
 
 #[tauri::command]
-pub async fn remove_frontend(app_handle: tauri::AppHandle, frontend: &str) -> Result<(), ()> {
+pub async fn remove_frontend(app_handle: tauri::AppHandle, frontend: &str) -> Result<String, ()> {
     let binding = app_handle.path_resolver().app_local_data_dir().unwrap();
     let path = Path::new(binding.to_str().unwrap()).join(frontend);
     remove_dir_all(path).unwrap();
-    Ok(())
+    Ok("not_downloaded".into())
 }
