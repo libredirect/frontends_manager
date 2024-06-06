@@ -2,8 +2,8 @@
 
 ## History
 After forking from Privacy Redirect, we started adding features. Those features were mainly about managing multiple instances. Mainly:
-- Unify Settings: A features which copies cookies (theme, subscriptions, etc...) from one instance to another. Then we went further and added support to Incognito mode. Then we went more further and added support for the Tor Browser (recreating cookies upon restart bc Tor Browser deletes them all).
-- Auto Skipp offline instances: A feature which detects a 500 server eror or a hostname error, and automatically switches to the next instance in the list.
+- Unify Settings: A feature which copies cookies (theme, subscriptions, etc...) from one instance to another. Then we went further and added support to Incognito mode. Then we went more further and added support for the Tor Browser (recreating cookies upon restart because Tor Browser deletes them all).
+- Auto Skip offline instances: A feature which detects a 500 server error or a hostname error, and automatically switches to the next instance in the list.
 
 On a fresh install, you would have **all** instances selected. Then we made it as **none** is selected at first, but then a user asked me "How will I know which instance to select or trust even?". Apparently we have two types of people:
 - A type where he selects all instances and doesn't care much.
@@ -11,7 +11,7 @@ On a fresh install, you would have **all** instances selected. Then we made it a
 
 ## Flaws with using an instance
 - The instance knows my IP address.
-- You can't trust if the instance ownerr is not logging what videos you're watching from your IP: this doesn't need any tracking scripts.
+- You can't trust if the instance owner is not logging what videos you're watching from your IP: this doesn't need any tracking scripts.
 
 Let's say you will use the Tor Browser or a VPN to spoof your IP, but...
 - How can I trust a random instance not changing the JS of the UI?: Technically possible, and also easily detected by a nerd.
