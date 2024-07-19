@@ -26,6 +26,12 @@
       },
       "shell": {
         "all": true
+      },
+      "fs": {
+        "all": true,
+        "scope": [
+          "$APPLOCALDATA/binary_frontends.json"
+        ]
       }
     },
     "bundle": {

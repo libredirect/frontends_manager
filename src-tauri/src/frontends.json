@@ -11,24 +11,20 @@
         "name": "AnonymousOverflow",
         "icon": "anonymousoverflow-icon.png"
     },
-    "simplytranslate": {
-        "name": "SimplyTranslate",
-        "icon": "simplytranslate-icon.png"
+    "biblioreads": {
+        "name": "Biblioreads",
+        "icon": "biblioreads.png"
     },
-    "dumb": {
-        "name": "Dumb",
-        "icon": "dumb.png"
-    },
-    "gothub": {
-        "name": "GotHub",
-        "icon": "github-icon-light.svg"
-    },
-    "neuters": {
-        "name": "Neuters",
-        "icon": "reuters-icon.svg"
+    "libremdb": {
+        "name": "LibreMDb",
+        "icon": "libremdb.png"
     },
     "libmedium": {
         "name": "LibMedium",
         "icon": "medium-icon.svg"
+    },
+    "gothub": {
+        "name": "GotHub",
+        "icon": "github-icon-light.svg"
     }
 }

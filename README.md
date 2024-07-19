@@ -21,7 +21,6 @@ Available Frontends:
  -->
 
 For Managing the frontends:
-- Web Server: [Caddy](https://caddyserver.com/)
 - GUI: [Tauri](https://tauri.app/)
 
 ## Development
